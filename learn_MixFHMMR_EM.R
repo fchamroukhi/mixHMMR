@@ -67,7 +67,7 @@ learn_MixFHMMR_EM = function(data, K, R, p, variance_type, ordered_states, total
   m=ncol(Y) #n  curves of m observations
   
   
-  exp_num_trans_k = array(data = 0, dim = c(R, K, n))    # intialization
+  exp_num_trans_k = array(data = 0, dim = c(R, R, n))    # intialization
   stored_loglik = vector()
   
   # regression matrix
@@ -93,6 +93,8 @@ learn_MixFHMMR_EM = function(data, K, R, p, variance_type, ordered_states, total
     ###################
     
     param = init_MixFHMMR(data, K, R, X, variance_type, ordered_states, init_kmeans, try_EM)
+    
+    browser()
     
     iter = 0
     converge = 0
@@ -229,7 +231,7 @@ learn_MixFHMMR_EM = function(data, K, R, p, variance_type, ordered_states, total
         Xkr = (sqrt(weights_cluster_k * weights_seg_k) %*% matrix(1,1,p+1)) * X   #[n*m x (p+1)]
         Ykr = (sqrt(weights_cluster_k * weights_seg_k)) * Y     #[n*m x 1] 
         #  Weighted least squares: maximization w.r.t beta_kr
-        beta_kr[,r] = solve(t(Xkr) %*% Xkr ) %*% t(Xkr) %*% Ykr    # Maximisation par rapport aux betakr
+        beta_kr[,r] = solve(t(Xkr) %*% Xkr , tol = 1e-30) %*% t(Xkr) %*% Ykr    # Maximisation par rapport aux betakr
 
          # # Maximization w.r.t sigmak :
         z = sqrt(weights_cluster_k * weights_seg_k) * (Y-X %*% beta_kr[,r])
@@ -309,8 +311,6 @@ learn_MixFHMMR_EM = function(data, K, R, p, variance_type, ordered_states, total
   klas = param_MAP$klas
   Cig = param_MAP$Z
   MixFHMMR$stats$klas = klas
-
-  browser()
   
   # cas où on prend la moyenne des gamma_ijkr
   smoothed =  matrix(0,m,K)

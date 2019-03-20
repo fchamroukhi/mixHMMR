@@ -30,9 +30,7 @@ MAP = function(PostProbs)
   K = dim(PostProbs)[2]
   # maximum a posteriori rule
   klas =  apply(PostProbs,1,which.max)
-  
-  browser()
-  
+ 
   partition_MAP = (klas %*% matrix(1,1,K)) == (matrix(1,n,1) %*% matrix(1:K,1,K))
   # double   
   Z = partition_MAP * 1

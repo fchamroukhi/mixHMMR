@@ -86,9 +86,12 @@ debugSource("normalize.R")
 debugSource("mk_stochastic.R")
 debugSource("forwards_backwards.R")
 debugSource("MAP.R")
+debugSource("show_MixRHLP_results.R")
 ##
 
 
-solution = learn_MixFHMMR_EM(Y, K, R, p, variance_type, ordered_sates, total_EM_tries, max_iter_EM, init_kmeans, threshold, verbose)
+mixFHMMR = learn_MixFHMMR_EM(Y, K, R, p, variance_type, ordered_sates, total_EM_tries, max_iter_EM, init_kmeans, threshold, verbose)
 
-a=1
+show_MixRHLP_results(Y, mixFHMMR)
+
+

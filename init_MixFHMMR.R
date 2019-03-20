@@ -14,7 +14,7 @@ init_MixFHMMR = function(data, K, R, Phi, variance_type, ordered_states, init_km
   
   # # 1. Initialization of cluster weights
   param$w_k=1/K*matrix(1,K,1)
-  param$A_k = array(data = 0, dim = c(K, R, p+1))
+  param$A_k = array(data = 0, dim = c(R, R,K))
   param$beta_kr = array(data = 0, dim = c(p + 1, R, K))
   param$pi_k = matrix(0, nrow = R, ncol = K)
   
@@ -184,7 +184,7 @@ init_regression_param = function(data, R, X,variance_type, try_algo)
       
       X_ij = apply(X[i:j,], 2, rep, n)
       
-      br = solve(t(X_ij) %*% X_ij) %*% t(X_ij) %*% Yij
+      br = solve(t(X_ij) %*% X_ij, tol = 1e-30) %*% t(X_ij) %*% Yij
       
       param$betar[,r] = br
       
@@ -221,7 +221,7 @@ init_regression_param = function(data, R, X,variance_type, try_algo)
       X_ij = X[i:j,]
       X_ij = apply(X_ij, 2, rep, n)
       
-      br = solve(t(X_ij) %*% X_ij) %*% t(X_ij) %*% Yij
+      br = solve(t(X_ij) %*% X_ij, tol = 1e-30) %*% t(X_ij) %*% Yij
       param$betar[,r] = br
       
       if (variance_type == "common") {
