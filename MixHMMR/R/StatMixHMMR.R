@@ -1,7 +1,7 @@
-# library(Rcpp)
-# Rcpp::sourceCpp("src/forwards_backwards.cpp")
+library(Rcpp)
+Rcpp::sourceCpp("src/forwards_backwards.cpp")
 
-source("R/forwards_backwards.R")
+# source("R/forwards_backwards.R")
 
 StatMixHMMR <- setRefClass(
   "StatMixHMMR",
