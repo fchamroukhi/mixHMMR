@@ -39,10 +39,10 @@ ParamMixHMMR <- setRefClass(
         ind <- sample(1:modelMixHMMR$n, modelMixHMMR$n)
         for (k in 1:modelMixHMMR$K) {
           if (k < modelMixHMMR$K) {
-            Yk <- modelMixHMMR$Y[ind[(k - 1) * round(modelMixHMMR$n / modelMixHMMR$K) + 1:k * round(modelMixHMMR$n / modelMixHMMR$K)], ]
+            Yk <- modelMixHMMR$Y[ind[((k - 1) * round(modelMixHMMR$n / modelMixHMMR$K) + 1):(k * round(modelMixHMMR$n / modelMixHMMR$K))], ]
           }
           else{
-            Yk <- modelMixHMMR$Y[ind[(k - 1) * round(modelMixHMMR$n / modelMixHMMR$K) + 1:modelMixHMMR$n], ]
+            Yk <- modelMixHMMR$Y[ind[((k - 1) * round(modelMixHMMR$n / modelMixHMMR$K) + 1):modelMixHMMR$n], ]
           }
 
           init_hmm_regression(Yk, k, modelMixHMMR$R, phi, modelMixHMMR$variance_type, order_constraint, try_algo)
