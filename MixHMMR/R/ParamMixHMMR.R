@@ -148,7 +148,7 @@ ParamMixHMMR <- setRefClass(
           }
         }
 
-      } else { # initialisation aléatoire
+      } else {# initialisation aléatoire
         Lmin <- round(m / (R + 1)) #nbr pts min dans un segments
         tr_init <- matrix(0, 1, R + 1)
         tr_init[1] <- 0
