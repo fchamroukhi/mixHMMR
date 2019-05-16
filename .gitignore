@@ -3,8 +3,4 @@
 .Rhistory
 .RData
 .Ruserdata
-MixHMMR/.DS_Store
-MixHMMR/.Rbuildignore
-MixHMMR/.Rhistory
-MixHMMR/.Rproj.user/
-MixHMMR/data/.DS_Store
+inst/doc

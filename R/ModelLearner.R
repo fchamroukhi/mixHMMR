@@ -1,7 +1,3 @@
-source("R/ParamMixHMMR.R")
-source("R/StatMixHMMR.R")
-source("R/FittedMixHMMR.R")
-
 EM <- function(modelMixHMMR, order_constraint = TRUE, n_tries = 1, max_iter = 1000, init_kmeans = TRUE, threshold = 1e-6, verbose = TRUE) {
 
   #   MixFHMMR =  seq_clust_MixFHMMR(data, K, R, p,fs, variance_type,...

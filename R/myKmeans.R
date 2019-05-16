@@ -5,7 +5,6 @@ myKmeans = function(X, K, nbr_runs, nbr_iter_max, verbose = FALSE) {
   #
   #
   #
-  # Faicel CHAMROUKHI Septembre 2008 (mise a jour)
   #
   #
   #
@@ -46,7 +45,7 @@ myKmeans = function(X, K, nbr_runs, nbr_iter_max, verbose = FALSE) {
   while (nb_run < nbr_runs) {
     nb_run = nb_run + 1
     if (nbr_runs > 0 && verbose) {
-      cat(sprintf("Kmeans : run n° %1i", nb_run), "\n")
+      cat(sprintf("Kmeans : run n?? %1i", nb_run), "\n")
     }
 
     iter = 0
@@ -83,14 +82,10 @@ myKmeans = function(X, K, nbr_runs, nbr_iter_max, verbose = FALSE) {
         } else  {
           # update the centres
 
-          #############################################################################
-          # Florian Lecocq 11/12/2018
-          # Comment: I added these lines to handle the case where a class is only one point
-          #############################################################################
           if (length(ind_ck) == 1) {
+
             centres[k,] = X[ind_ck, ]
-            #############################################################################
-            #############################################################################
+
           } else {
 
             centres[k,] = apply(X[ind_ck, ], 2, mean)
@@ -103,15 +98,9 @@ myKmeans = function(X, K, nbr_runs, nbr_iter_max, verbose = FALSE) {
 
       criteria = (abs(current_err - previous_err)) / previous_err < 1e-6
 
-      #############################################################################
-      # Florian Lecocq 18/03/2019
-      # Comment: Handle the first pass
-      #############################################################################
       if (iter == 1) {
         criteria = FALSE
       }
-      #############################################################################
-      #############################################################################
 
       if (criteria) {
         converged = TRUE

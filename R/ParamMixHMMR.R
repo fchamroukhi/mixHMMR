@@ -1,8 +1,3 @@
-source("R/enums.R")
-source("R/utils.R")
-source("R/myKmeans.R")
-source("R/mk_stochastic.R")
-
 ParamMixHMMR <- setRefClass(
   "ParamMixHMMR",
   fields = list(
@@ -53,16 +48,16 @@ ParamMixHMMR <- setRefClass(
 
 
     init_hmm_regression = function(Y, k, R, phi, variance_type, order_constraint = TRUE, try_algo) {
-      # init_hmm_regression estime les paramètres initiaux d'un modèle de regression
-      # à processus markovien cache où la loi conditionnelle des observations est une gaussienne
+      # init_hmm_regression estime les parametres initiaux d'un modele de regression
+      # processus markovien cache ou la loi conditionnelle des observations est une gaussienne
       #
       # Entrees :
       #
       #        data  = n sequences each sequence is of m points
       #        signaux les observations sont monodimentionnelles)
-      #        K : nbre d'états (classes) cachés
+      #        K : nbre d'etats (classes) caches
       #        duree_signal :  duree du signal en secondes
-      #        fs : fréquence d'échantiloonnage des signaux en Hz
+      #        fs : frequence d'echantiloonnage des signaux en Hz
       #        ordre_reg : ordre de regression polynomiale
       #
       # Sorties :
@@ -78,7 +73,6 @@ ParamMixHMMR <- setRefClass(
       #         4. sigmak(k) = variance de x(i) sachant z(i)=k; sigmak(j) =
       #         sigma^2_k.
       #
-      # Faicel Chamroukhi, Novembre 2008
       ################################################################################
 
       # 1. Initialization of the HMM parameters
@@ -148,7 +142,7 @@ ParamMixHMMR <- setRefClass(
           }
         }
 
-      } else {# initialisation aléatoire
+      } else {# initialisation aleatoire
         Lmin <- round(m / (R + 1)) #nbr pts min dans un segments
         tr_init <- matrix(0, 1, R + 1)
         tr_init[1] <- 0
