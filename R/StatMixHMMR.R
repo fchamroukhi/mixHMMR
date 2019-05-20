@@ -127,7 +127,7 @@ StatMixHMMR <- setRefClass(
 
           # forwards backwards ( calcul de logProb(Yi)...)
 
-          fb <- forwards_backwards(paramMixHMMR$pi_k[, k], paramMixHMMR$A_k[, , k], fkr_yij)
+          fb <- forwardsBackwards(paramMixHMMR$pi_k[, k], paramMixHMMR$A_k[, , k], fkr_yij)
 
           gamma_ik <- fb$tau_tk
           xi_ik <- fb$xi_tk
