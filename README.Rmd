@@ -1,0 +1,71 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.path = "man/figures/README-"
+)
+```
+## Overview
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+R code for the **clustering** and **segmentation** of time series (including with regime changes) by mixture of gaussian Hidden Markov Models Regression (MixHMMR) and the EM algorithm; i.e functional data clustering and segmentation
+
+## Installation
+
+You can install the development version of mixHMMR from [GitHub](https://github.com/) with:
+
+```{r, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("fchamroukhi/mixHMMR")
+```
+
+To build *vignettes* for examples of usage, type the command below instead:
+
+```{r, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("fchamroukhi/mixHMMR", 
+                         build_opts = c("--no-resave-data", "--no-manual"), 
+                         build_vignettes = TRUE)
+```
+
+Use the following command to display vignettes:
+
+```{r, eval = FALSE}
+browseVignettes("mixHMMR")
+```
+
+## Usage
+
+```{r, message = FALSE}
+library(mixHMMR)
+
+data("simulatedtimeseries")
+fData <- FData$new()
+fData$setData(t(simulatedtimeseries$X), t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]))
+
+K <- 3 # number of clusters
+R <- 3 # number of regimes/states
+p <- 2 # degree of the polynomial regression
+variance_type = variance_types$hetereskedastic
+modelMixHMMR <- ModelMixHMMR(fData, K, R, p, variance_type)
+
+ordered_states = TRUE
+n_tries = 1
+max_iter = 1000
+init_kmeans = TRUE
+threshold = 1e-6
+verbose = TRUE
+
+solution <- EM(modelMixHMMR, ordered_states, n_tries, max_iter, init_kmeans, threshold, verbose)
+
+solution$plot()
+```
