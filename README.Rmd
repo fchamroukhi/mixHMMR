@@ -50,7 +50,7 @@ library(mixHMMR)
 
 data("simulatedtimeseries")
 fData <- FData$new()
-fData$setData(t(simulatedtimeseries$X), t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]))
+fData$setData(simulatedtimeseries$X, t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]))
 
 K <- 3 # number of clusters
 R <- 3 # number of regimes/states
