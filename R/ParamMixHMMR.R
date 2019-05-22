@@ -96,7 +96,7 @@ ParamMixHMMR <- setRefClass(
 
         # Initialisation de la loi initiale de la variable cachee
         pi_k[, k] <<- c(1, matrix(0, R - 1, 1)) # 1 / R * matrix(1, R, 1)
-        A_k[, , k] <<- mk_stochastic(matrix(runif(R), R, R))
+        A_k[, , k] <<- mkStochastic(matrix(runif(R), R, R))
       }
 
       # 2.  Initialisation of regression coefficients and variances
@@ -220,11 +220,11 @@ ParamMixHMMR <- setRefClass(
         }
 
 
-        A_k[, , k] <<- mk_stochastic(temp)
+        A_k[, , k] <<- mkStochastic(temp)
 
         # if HMM with order constraints
         if (order_constraint) {
-          A_k[, , k] <<- mk_stochastic(mask * A_k[, , k])
+          A_k[, , k] <<- mkStochastic(mask * A_k[, , k])
         }
 
         # Maximisation de Q4 par rapport aux betak et sigmak
