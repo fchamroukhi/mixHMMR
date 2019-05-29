@@ -14,7 +14,7 @@ Collate:
     enums.R
     utils.R
     mkStochastic.R
-    myKmeans.R
+    kmeans.R
     FData.R
     ModelMixHMMR.R
     ParamMixHMMR.R

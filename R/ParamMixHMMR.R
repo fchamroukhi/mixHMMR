@@ -21,7 +21,7 @@ ParamMixHMMR <- setRefClass(
         max_iter_kmeans <- 400
         n_tries_kmeans <- 20
         verbose_kmeans <- 0
-        solution <- myKmeans(modelMixHMMR$Y, modelMixHMMR$K, n_tries_kmeans, max_iter_kmeans, verbose_kmeans)
+        solution <- kmeans(modelMixHMMR$Y, modelMixHMMR$K, n_tries_kmeans, max_iter_kmeans, verbose_kmeans)
 
         for (k in 1:modelMixHMMR$K) {
           Yk <- modelMixHMMR$Y[solution$klas == k , ] #if kmeans
