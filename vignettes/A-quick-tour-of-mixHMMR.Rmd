@@ -38,7 +38,6 @@ See `help(package="mixHMMR")` for further details and references provided by `ci
 
 ```{r}
 data("simulatedtimeseries")
-fData <- FData(simulatedtimeseries$X, t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]))
 ```
 
 # Set up mixHMMR model parameters
@@ -48,7 +47,6 @@ K <- 3 # number of clusters
 R <- 3 # number of regimes/states
 p <- 2 # degree of the polynomial regression
 variance_type = variance_types$heteroskedastic
-modelMixHMMR <- ModelMixHMMR(fData, K, R, p, variance_type)
 ```
 
 # Set up EM parameters
@@ -65,7 +63,7 @@ verbose = TRUE
 # Estimation
 
 ```{r}
-solution <- EM(modelMixHMMR, ordered_states, n_tries, max_iter, init_kmeans, threshold, verbose)
+solution <- emMixHMMR(simulatedtimeseries$X, t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]), K, R, p, variance_type, ordered_states, n_tries, max_iter, init_kmeans, threshold, verbose)
 ```
 
 # Plots

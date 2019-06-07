@@ -1,54 +1,84 @@
+#' @export
 ParamMixHMMR <- setRefClass(
   "ParamMixHMMR",
   fields = list(
-    w_k = "matrix", # prior = "matrix",
+    fData = "FData",
+    phi = "matrix",
+
+    K = "numeric", # Number of clusters
+    R = "numeric", # Number of regimes (HMM states)
+    p = "numeric", # Dimension of beta (order of polynomial regression)
+    variance_type = "numeric",
+    nu = "numeric", # Degree of freedom
+
+    w_k = "matrix", # Cluster weights
     pi_k = "matrix", # Initial distributions
-    # trans_mat = "matrix",
     A_k = "array", # Transition matrices
     beta_kr = "array", # Polynomial regression coefficient vectors
-    # beta = "matrix",
-    sigma_kr = "matrix",
-    # Standard deviations
+    sigma_kr = "matrix", # Variances
     mask = "matrix"
   ),
   methods = list(
-    init_MixFHMMR = function(modelMixHMMR, phi, order_constraint = TRUE, init_kmeans = TRUE, try_algo = 1) {
-      # # 1. Initialization of cluster weights
-      w_k <<- 1 / K * matrix(1, modelMixHMMR$K, 1)
+
+    initialize = function(fData = FData(numeric(1), matrix(1)), K = 2, R = 1, p = 2, variance_type = 1) {
+
+      fData <<- fData
+
+      phi <<- designmatrix(x = fData$X, p = p)$XBeta
+
+      K <<- K
+      R <<- R
+      p <<- p
+      variance_type <<- variance_type
+
+      w_k <<- matrix(NA, nrow = K)
+      pi_k <<- matrix(NA, nrow = R, ncol = K)
+      A_k <<- array(NA, dim = c(R, R, K))
+      beta_kr <<- array(NA, dim = c(p + 1, R, K))
+
+      if (variance_type == variance_types$homoskedastic) {
+        sigma_kr <<- matrix(NA, ncol = K)
+      } else {
+        sigma_kr <<- matrix(NA, nrow = R, ncol = K)
+      }
+      mask <<- matrix(NA, R, R)
+
+    },
+
+    initMixFHMMR = function(order_constraint = TRUE, init_kmeans = TRUE, try_algo = 1) {
+
+      # 1. Initialization of cluster weights
+      w_k <<- 1 / K * matrix(1, K, 1)
 
       # Initialization of the model parameters for each cluster
       if (init_kmeans) {
         max_iter_kmeans <- 400
         n_tries_kmeans <- 20
         verbose_kmeans <- 0
-        solution <- kmeans(modelMixHMMR$Y, modelMixHMMR$K, n_tries_kmeans, max_iter_kmeans, verbose_kmeans)
+        solution <- kmeans(fData$Y, K, n_tries_kmeans, max_iter_kmeans, verbose_kmeans)
 
-        for (k in 1:modelMixHMMR$K) {
-          Yk <- modelMixHMMR$Y[solution$klas == k , ] #if kmeans
-
-          init_hmm_regression(Yk, k, modelMixHMMR$R, phi, modelMixHMMR$variance_type, order_constraint, try_algo)
-
+        for (k in 1:K) {
+          Yk <- fData$Y[solution$klas == k , ] #if kmeans
+          initHmmRegression(Yk, k, R, phi, variance_type, order_constraint, try_algo)
         }
 
-      } else{
-        ind <- sample(1:modelMixHMMR$n, modelMixHMMR$n)
-        for (k in 1:modelMixHMMR$K) {
-          if (k < modelMixHMMR$K) {
-            Yk <- modelMixHMMR$Y[ind[((k - 1) * round(modelMixHMMR$n / modelMixHMMR$K) + 1):(k * round(modelMixHMMR$n / modelMixHMMR$K))], ]
-          }
-          else{
-            Yk <- modelMixHMMR$Y[ind[((k - 1) * round(modelMixHMMR$n / modelMixHMMR$K) + 1):modelMixHMMR$n], ]
+      } else {
+        ind <- sample(1:fData$n, fData$n)
+        for (k in 1:K) {
+          if (k < K) {
+            Yk <- fData$Y[ind[((k - 1) * round(fData$n / K) + 1):(k * round(fData$n / K))], ]
+          } else {
+            Yk <- fData$Y[ind[((k - 1) * round(fData$n / K) + 1):fData$n], ]
           }
 
-          init_hmm_regression(Yk, k, modelMixHMMR$R, phi, modelMixHMMR$variance_type, order_constraint, try_algo)
+          initHmmRegression(Yk, k, R, phi, variance_type, order_constraint, try_algo)
 
         }
       }
     },
 
-
-    init_hmm_regression = function(Y, k, R, phi, variance_type, order_constraint = TRUE, try_algo) {
-      # init_hmm_regression estime les parametres initiaux d'un modele de regression
+    initHmmRegression = function(Y, k, R, phi, variance_type, order_constraint = TRUE, try_algo) {
+      # initHmmRegression estime les parametres initiaux d'un modele de regression
       # processus markovien cache ou la loi conditionnelle des observations est une gaussienne
       #
       # Entrees :
@@ -77,10 +107,10 @@ ParamMixHMMR <- setRefClass(
 
       # 1. Initialization of the HMM parameters
       if (order_constraint) {
-        # # Initialisation en tenant compte de la contrainte:
+        # Initialisation en tenant compte de la contrainte:
 
         # Initialisation de la matrice des transitions
-        maskM <- diag(R)#mask d'ordre 1
+        maskM <- diag(R) # Mask of order 1
         for (r in 1:R - 1) {
           ind <- which(maskM[r, ] != 0)
           maskM[r, ind + 1] <- 1
@@ -95,16 +125,15 @@ ParamMixHMMR <- setRefClass(
       } else {
 
         # Initialisation de la loi initiale de la variable cachee
-        pi_k[, k] <<- c(1, matrix(0, R - 1, 1)) # 1 / R * matrix(1, R, 1)
+        pi_k[, k] <<- c(1, matrix(0, R - 1, 1))
         A_k[, , k] <<- mkStochastic(matrix(runif(R), R, R))
       }
 
-      # 2.  Initialisation of regression coefficients and variances
-      init_regression_param(Y, k, R, phi, variance_type, try_algo)
+      # 2. Initialisation of regression coefficients and variances
+      initRegressionParam(Y, k, R, phi, variance_type, try_algo)
     },
 
-    ###################################################################################
-    init_regression_param = function(Y, k, R, phi, variance_type, try_algo) {
+    initRegressionParam = function(Y, k, R, phi, variance_type, try_algo) {
 
       n <- nrow(Y)
       m <- ncol(Y)
@@ -115,8 +144,6 @@ ParamMixHMMR <- setRefClass(
 
       if (try_algo == 1) {
 
-        ##############################
-        #decoupage de l'echantillon (signal) en K segments
         zi <- round(m / R) - 1
         for (r in 1:R) {
           i <- (r - 1) * zi + 1
@@ -142,8 +169,8 @@ ParamMixHMMR <- setRefClass(
           }
         }
 
-      } else {# initialisation aleatoire
-        Lmin <- round(m / (R + 1)) #nbr pts min dans un segments
+      } else {
+        Lmin <- round(m / (R + 1))
         tr_init <- matrix(0, 1, R + 1)
         tr_init[1] <- 0
         R_1 <- R
@@ -180,93 +207,84 @@ ParamMixHMMR <- setRefClass(
       }
     },
 
-
-    MStep = function(modelMixHMMR, statMixHMM, phi, order_constraint = TRUE) {
+    MStep = function(statMixHMM, order_constraint = TRUE) {
 
       # Maximization of Q1 w.r.t w_k
+      w_k <<- matrix(apply(statMixHMM$tau_ik, 2, sum)) / fData$n
 
-      w_k <<- matrix(apply(statMixHMM$tau_ik, 2, sum)) / modelMixHMMR$n
+      exp_num_trans_k <- array(0, dim = c(R, R, fData$n))
 
-      exp_num_trans_k <- array(0, dim = c(modelMixHMMR$R, modelMixHMMR$R, modelMixHMMR$n))
+      for (k in 1:K) {
 
-      for (k in 1:modelMixHMMR$K) {
-
-        if (modelMixHMMR$variance_type == variance_types$homoskedastic) {
+        if (variance_type == variance_types$homoskedastic) {
           s <- 0
         }
 
         weights_cluster_k <- statMixHMM$tau_ik[, k]
 
         # Maximization of Q2 w.r.t \pi^g
-        exp_num_trans_k_from_l <- (matrix(1, modelMixHMMR$R, 1) %*% t(weights_cluster_k)) * statMixHMM$exp_num_trans_from_l[, , k] # [R x n]
+        exp_num_trans_k_from_l <- (matrix(1, R, 1) %*% t(weights_cluster_k)) * statMixHMM$exp_num_trans_from_l[, , k] # [R x n]
 
         pi_k[, k] <<- (1 / sum(statMixHMM$tau_ik[, k])) * apply(exp_num_trans_k_from_l, 1, sum) # sum over i
 
         # Maximization of Q3 w.r.t A^g
+        for (r in 1:R) {
 
-        for (r in 1:modelMixHMMR$R) {
-
-          if (modelMixHMMR$n == 1) {
-            exp_num_trans_k[r, , ] <- t(matrix(1, modelMixHMMR$R, 1) %*% weights_cluster_k) * drop(statMixHMM$exp_num_trans[r, , , k])
-          } else{
-            exp_num_trans_k[r, , ] <- (matrix(1, modelMixHMMR$R, 1) %*% t(weights_cluster_k)) * drop(statMixHMM$exp_num_trans[r, , , k])
+          if (fData$n == 1) {
+            exp_num_trans_k[r, , ] <- t(matrix(1, R, 1) %*% weights_cluster_k) * drop(statMixHMM$exp_num_trans[r, , , k])
+          } else {
+            exp_num_trans_k[r, , ] <- (matrix(1, R, 1) %*% t(weights_cluster_k)) * drop(statMixHMM$exp_num_trans[r, , , k])
           }
         }
 
-        if (modelMixHMMR$n == 1) {
+        if (fData$n == 1) {
           temp <- exp_num_trans_k
-        } else{
+        } else {
           temp <- apply(exp_num_trans_k, MARGIN = c(1, 2), sum) # sum over i
         }
 
-
         A_k[, , k] <<- mkStochastic(temp)
 
-        # if HMM with order constraints
+        # If HMM with order constraints
         if (order_constraint) {
           A_k[, , k] <<- mkStochastic(mask * A_k[, , k])
         }
 
         # Maximisation de Q4 par rapport aux betak et sigmak
 
-        Ng <- apply(statMixHMM$tau_ik, 2, sum) # nbr of individuals within the cluster k ,k=1...K estimated at iteration q
-        ng <- Ng # cardinal nbr of the cluster k
-        # each sequence i (m observations) is first weighted by the cluster weights
-        weights_cluster_k <- matrix(t(statMixHMM$tau_ik[, k]), nrow = modelMixHMMR$m, ncol = ncol(t(statMixHMM$tau_ik)), byrow = T)
+        Ng <- apply(statMixHMM$tau_ik, 2, sum) # Nbr of individuals within the cluster k ,k=1...K estimated at iteration q
+        ng <- Ng # Cardinal nbr of the cluster k
+        # Each sequence i (m observations) is first weighted by the cluster weights
+        weights_cluster_k <- matrix(t(statMixHMM$tau_ik[, k]), nrow = fData$m, ncol = ncol(t(statMixHMM$tau_ik)), byrow = T)
         weights_cluster_k <- matrix(as.vector(weights_cluster_k), length(as.vector(weights_cluster_k)), 1)
 
-        # secondly, the m observations of each sequence are weighted by the
+        # Secondly, the m observations of each sequence are weighted by the
         # weights of each segment k (post prob of the segments for each
         # cluster g)
         gamma_ijk <- statMixHMM$gamma_ikjr[, , k] # [n*m R]
 
-        nm_kr <- apply(gamma_ijk, 2, sum) # cardinal nbr of the segments r,r=1,...,R within each cluster k, at iteration q
+        nm_kr <- apply(gamma_ijk, 2, sum) # Cardinal nbr of the segments r,r=1,...,R within each cluster k, at iteration q
 
-        for (r in 1:modelMixHMMR$R) {
-          nmkr <- nm_kr[r] # cardinal nbr of segment k for the cluster k
+        for (r in 1:R) {
+          nmkr <- nm_kr[r] # Cardinal nbr of segment k for the cluster k
 
           weights_seg_k <- matrix(gamma_ijk[, r])
 
-          Xkr <- (sqrt(weights_cluster_k * weights_seg_k) %*% matrix(1, 1, modelMixHMMR$p + 1)) * repmat(phi, modelMixHMMR$n, 1) # [n*m x (p+1)]
-          Ykr <- (sqrt(weights_cluster_k * weights_seg_k)) * modelMixHMMR$vecY # [n*m x 1]
+          Xkr <- (sqrt(weights_cluster_k * weights_seg_k) %*% matrix(1, 1, p + 1)) * repmat(phi, fData$n, 1) # [n*m x (p+1)]
+          Ykr <- (sqrt(weights_cluster_k * weights_seg_k)) * fData$vecY # [n*m x 1]
 
           # Weighted least squares: maximization w.r.t beta_kr
           beta_kr[, r, k] <<- solve(t(Xkr) %*% Xkr) %*% t(Xkr) %*% Ykr # Maximisation par rapport aux betakr
-          # W_kr = diag(weights_cluster_k.*weights_seg_k);
-          # beta_kr(:,k) = inv(Phi'*W_kr*Phi)*Phi'*W_kr*X;
 
           # Maximization w.r.t sigmak :
+          z <- sqrt(weights_cluster_k * weights_seg_k) * (fData$vecY - repmat(phi, fData$n, 1) %*% beta_kr[, r, k])
 
-          z <- sqrt(weights_cluster_k * weights_seg_k) * (modelMixHMMR$vecY - repmat(phi, modelMixHMMR$n, 1) %*% beta_kr[, r, k])
-
-          if (modelMixHMMR$variance_type == variance_types$homoskedastic) {
+          if (variance_type == variance_types$homoskedastic) {
             s <- s + (t(z) %*% z)
-            ngm <- sum(sum(weights_cluster_k %*% matrix(1, 1, modelMixHMMR$R)) * gamma_ijk)
+            ngm <- sum(sum(weights_cluster_k %*% matrix(1, 1, R)) * gamma_ijk)
 
-            # sigma_k <- s/ngm
             sigma_kr[k] <<- s / ngm
-          }
-          else{
+          } else {
             ngmk <- sum(weights_cluster_k * weights_seg_k)
 
             sigma_kr[r, k] <<- (t(z) %*% z) / ngmk
@@ -276,29 +294,3 @@ ParamMixHMMR <- setRefClass(
     }
   )
 )
-
-ParamMixHMMR <- function(modelMixHMMR) {
-  w_k <- matrix(NA, nrow = modelMixHMMR$K)
-  # prior <- matrix(NA, ncol = modelMixHMMR$K - 1)
-  pi_k <- matrix(NA, nrow = modelMixHMMR$R, ncol = modelMixHMMR$K)
-  # trans_mat <- matrix(NA, modelMixHMMR$K, modelMixHMMR$K)
-  A_k <- array(NA, dim = c(modelMixHMMR$R, modelMixHMMR$R, modelMixHMMR$K))
-  # beta <- matrix(NA, modelMixHMMR$p + 1, modelMixHMMR$K)
-  beta_kr <- array(NA, dim = c(modelMixHMMR$p + 1, modelMixHMMR$R, modelMixHMMR$K))
-  if (modelMixHMMR$variance_type == variance_types$homoskedastic) {
-    sigma_kr <- matrix(NA, ncol = modelMixHMMR$K)
-  }
-  else{
-    sigma_kr <- matrix(NA, nrow = modelMixHMMR$R, ncol = modelMixHMMR$K)
-  }
-  mask <- matrix(NA, modelMixHMMR$R, modelMixHMMR$R)
-  new(
-    "ParamMixHMMR",
-    w_k = w_k,
-    pi_k = pi_k,
-    A_k = A_k,
-    beta_kr = beta_kr,
-    sigma_kr = sigma_kr,
-    mask = mask
-  )
-}

@@ -1,4 +1,5 @@
-EM <- function(modelMixHMMR, order_constraint = TRUE, n_tries = 1, max_iter = 1000, init_kmeans = TRUE, threshold = 1e-6, verbose = TRUE) {
+#' @export
+emMixHMMR <- function(X, Y, K, R, p, variance_type, order_constraint = TRUE, n_tries = 1, max_iter = 1000, init_kmeans = TRUE, threshold = 1e-6, verbose = TRUE) {
 
   #   MixFHMMR =  seq_clust_MixFHMMR(data, K, R, p,fs, variance_type,...
   #               order_constraint, total_EM_tries, max_iter_EM, init_kmeans, threshold, verbose)
@@ -61,9 +62,9 @@ EM <- function(modelMixHMMR, order_constraint = TRUE, n_tries = 1, max_iter = 10
   #          15. weighted_polynomials
   #
   #
-  ################################## Faicel Chamroukhi (septembre 2009) ###########################################################
+  #############################################################################################
 
-  phi <- designmatrix(x = modelMixHMMR$X, p = modelMixHMMR$p)$XBeta
+  fData <- FData$new(X = X, Y = Y)
 
   try_EM <- 0
   best_loglik <- -Inf
@@ -75,33 +76,29 @@ EM <- function(modelMixHMMR, order_constraint = TRUE, n_tries = 1, max_iter = 10
     start_time <- Sys.time()
 
     ###################
-    #  Initialization #
+    # Initialization #
     ###################
 
-    param <- ParamMixHMMR(modelMixHMMR)
-    param$init_MixFHMMR(modelMixHMMR, phi, order_constraint, init_kmeans, try_EM)
+    param <- ParamMixHMMR$new(fData = fData, K = K, R = R, p = p, variance_type = variance_type)
+    param$initMixFHMMR(order_constraint, init_kmeans, try_EM)
 
     iter <- 0
     converged <- FALSE
-    # loglik <- 0
     prev_loglik <- -Inf
-    # stored_loglik<-c()
-    # stats<-list(mask=param$mask)
 
-    stat <- StatMixHMMR(modelMixHMMR)
+    stat <- StatMixHMMR$new(paramMixHMMR = param)
 
-    # main algorithm
-    # # EM ####
+    # EM
     while ((iter <= max_iter) & !converged) {
       ##########
       # E-Step #
       ##########
-      stat$EStep(modelMixHMMR, param, phi)
+      stat$EStep(param)
 
       ##########
       # M-Step #
       ##########
-      param$MStep(modelMixHMMR, stat, phi, order_constraint)
+      param$MStep(stat, order_constraint)
 
       iter <- iter + 1
 
@@ -121,7 +118,7 @@ EM <- function(modelMixHMMR, order_constraint = TRUE, n_tries = 1, max_iter = 10
       prev_loglik <- stat$loglik
       stat$stored_loglik[iter] <- stat$loglik
 
-    }# end of EM  loop
+    } # End of EM  loop
 
     cputime_total <- cbind(cputime_total, Sys.time() - start_time)
 
@@ -146,8 +143,8 @@ EM <- function(modelMixHMMR, order_constraint = TRUE, n_tries = 1, max_iter = 10
   statSolution$MAP()
 
   # FINISH computation of statSolution
-  statSolution$computeStats(modelMixHMMR, paramSolution, phi, cputime_total)
+  statSolution$computeStats(param, cputime_total)
 
-  return(FittedMixHMMR(modelMixHMMR, paramSolution, statSolution))
+  return(ModelMixHMMR(paramMixHMMR = paramSolution, statMixHMMR = statSolution))
 
 }
