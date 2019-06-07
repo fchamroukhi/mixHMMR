@@ -98,12 +98,12 @@ StatMixHMMR <- setRefClass(
             betakr <- beta_kr[, r]
 
             if (paramMixHMMR$variance_type == variance_types$homoskedastic) {
-              sigma_kr <- paramMixHMMR$sigma_kr[, k]
-              sk <- sigma_kr
+              sigma2_kr <- paramMixHMMR$sigma2_kr[, k]
+              sk <- sigma2_kr
             }
             else{
-              sigma_kr <- paramMixHMMR$sigma_kr[, k]
-              sk <- sigma_kr[r]
+              sigma2_kr <- paramMixHMMR$sigma2_kr[, k]
+              sk <- sigma2_kr[r]
             }
             z <- ((y_i - t(paramMixHMMR$phi %*% betakr)) ^ 2) / sk
 

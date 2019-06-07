@@ -15,7 +15,7 @@ ParamMixHMMR <- setRefClass(
     pi_k = "matrix", # Initial distributions
     A_k = "array", # Transition matrices
     beta_kr = "array", # Polynomial regression coefficient vectors
-    sigma_kr = "matrix", # Variances
+    sigma2_kr = "matrix", # Variances
     mask = "matrix"
   ),
   methods = list(
@@ -37,9 +37,9 @@ ParamMixHMMR <- setRefClass(
       beta_kr <<- array(NA, dim = c(p + 1, R, K))
 
       if (variance_type == variance_types$homoskedastic) {
-        sigma_kr <<- matrix(NA, ncol = K)
+        sigma2_kr <<- matrix(NA, ncol = K)
       } else {
-        sigma_kr <<- matrix(NA, nrow = R, ncol = K)
+        sigma2_kr <<- matrix(NA, nrow = R, ncol = K)
       }
       mask <<- matrix(NA, R, R)
 
@@ -160,12 +160,12 @@ ParamMixHMMR <- setRefClass(
 
           if (variance_type == variance_types$homoskedastic) {
             s <- s + sum((Yij - Phi_ij %*% bk) ^ 2)
-            sigma_kr[, k] <<- s / (n * m)
+            sigma2_kr[, k] <<- s / (n * m)
           } else {
             mk <- j - i + 1
             z = Yij - Phi_ij %*% bk
             sk = t(z) %*% z / (n * mk)
-            sigma_kr[r, k] <<- sk
+            sigma2_kr[r, k] <<- sk
           }
         }
 
@@ -196,12 +196,12 @@ ParamMixHMMR <- setRefClass(
 
           if (variance_type == variance_types$homoskedastic) {
             s <- s + sum((Yij - Phi_ij %*% bk) ^ 2)
-            sigma_kr[, k] <<- s / (n * m)
+            sigma2_kr[, k] <<- s / (n * m)
           } else {
             mk <- j - i + 1
             z = Yij - Phi_ij %*% bk
             sk = t(z) %*% z / (n * mk)
-            sigma_kr[r, k] <<- sk
+            sigma2_kr[r, k] <<- sk
           }
         }
       }
@@ -283,11 +283,11 @@ ParamMixHMMR <- setRefClass(
             s <- s + (t(z) %*% z)
             ngm <- sum(sum(weights_cluster_k %*% matrix(1, 1, R)) * gamma_ijk)
 
-            sigma_kr[k] <<- s / ngm
+            sigma2_kr[k] <<- s / ngm
           } else {
             ngmk <- sum(weights_cluster_k * weights_seg_k)
 
-            sigma_kr[r, k] <<- (t(z) %*% z) / ngmk
+            sigma2_kr[r, k] <<- (t(z) %*% z) / ngmk
           }
         }
       }
