@@ -1,6 +1,21 @@
 citHeader("To cite mixHMMR in publications use:")
 
 citEntry(
+  entry = "Article",
+  title = "Model-Based Clustering and Classification of Functional Data",
+  author = personList(person(given="F.", family="Chamroukhi"),
+                      person(given="Hien D.", family="Nguyen")),
+  journal = "Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery",
+  year = "2019",
+  url = "https://chamroukhi.com/papers/MBCC-FDA.pdf",
+  doi = "https://doi.org/10.1002/widm.1298",
+  textVersion = "Chamroukhi F, Nguyen H (2019). \u201cModel-Based Clustering and
+  Classification of Functional Data.\u201d Wiley Interdisciplinary Reviews: Data Mining and
+  Knowledge Discovery. doi: 10.1002/widm.1298 (URL: https://doi.org/10.1002/widm.1298),
+  <URL: https://chamroukhi.com/papers/MBCC-FDA.pdf>."
+)
+
+citEntry(
   entry = "InProceedings",
   title = "Model-based clustering with Hidden Markov Model regression for time series
           with regime changes",
@@ -16,8 +31,8 @@ citEntry(
   url = "https://chamroukhi.com/papers/Chamroukhi-ijcnn-2011.pdf",
   textVersion = "Chamroukhi F, Sam\u00e9 A, Aknin P, Govaert G (2011). \u201cModel-based
   clustering with Hidden Markov Model regression for time series with regime changes.\u201d
-  In _Proceedings of the International Joint Conference on Neural Networks (IJCNN),
-  IEEE_, 2814-2821. <URL: https://chamroukhi.com/papers/Chamroukhi-ijcnn-2011.pdf>."
+  In Proceedings of the International Joint Conference on Neural Networks (IJCNN),
+  IEEE, 2814-2821. <URL: https://chamroukhi.com/papers/Chamroukhi-ijcnn-2011.pdf>."
 )
 
 citEntry(
@@ -27,22 +42,7 @@ citEntry(
   school = "Universit\\'{e} de Technologie de Compi\\`{e}gne",
   year = "2010",
   url = "https://chamroukhi.com/papers/FChamroukhi-Thesis.pdf",
-  textVersion = "Chamroukhi F (2010). _Hidden process regression for curve modeling,
-  classification and tracking_. Ph.D. thesis, Universit\u00e9 de Technologie de Compi\u00e8gne.
-  <URL: https://chamroukhi.com/papers/FChamroukhi-Thesis.pdf>."
-)
-
-citEntry(
-  entry = "Article",
-  title = "Model-Based Clustering and Classification of Functional Data",
-  author = personList(person(given="F.", family="Chamroukhi"),
-                      person(given="Hien D.", family="Nguyen")),
-  journal = "Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery",
-  year = "2019",
-  url = "https://chamroukhi.com/papers/MBCC-FDA.pdf",
-  doi = "https://doi.org/10.1002/widm.1298",
-  textVersion = "Chamroukhi F, Nguyen H (2019). \u201cModel-Based Clustering and Classification
-  of Functional Data.\u201d _Wiley Interdisciplinary Reviews: Data Mining and Knowledge
-  Discovery_. doi: 10.1002/widm.1298 (URL: https://doi.org/10.1002/widm.1298),
-  <URL: https://chamroukhi.com/papers/MBCC-FDA.pdf>."
+  textVersion = "Chamroukhi F (2010). Hidden process regression for curve modeling,
+  classification and tracking. Ph.D. thesis, Universit\u00e9 de Technologie de
+  Compi\u00e8gne. <URL: https://chamroukhi.com/papers/FChamroukhi-Thesis.pdf>."
 )
