@@ -22,6 +22,13 @@ ParamMixHMMR <- setRefClass(
 
     initialize = function(fData = FData(numeric(1), matrix(1)), K = 2, R = 1, p = 2, variance_type = 1) {
 
+      if (variance_type == variance_types$homoskedastic) {
+        nu <<- (K - 1) + K * ((R - 1) + R * (R - 1) + R * (p + 1) + 1)
+      }
+      else{
+        nu <<- (K - 1) + K * ((R - 1) + R * (R - 1) + R * (p + 1) + R)
+      }
+
       fData <<- fData
 
       phi <<- designmatrix(x = fData$X, p = p)$XBeta
