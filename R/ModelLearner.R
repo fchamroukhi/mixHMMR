@@ -1,5 +1,5 @@
 #' @export
-emMixHMMR <- function(X, Y, K, R, p, variance_type, order_constraint = TRUE, n_tries = 1, max_iter = 1000, init_kmeans = TRUE, threshold = 1e-6, verbose = TRUE) {
+emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "homoskedastic"), order_constraint = TRUE, n_tries = 1, max_iter = 1000, init_kmeans = TRUE, threshold = 1e-6, verbose = TRUE) {
 
   #   MixFHMMR =  seq_clust_MixFHMMR(data, K, R, p,fs, variance_type,...
   #               order_constraint, total_EM_tries, max_iter_EM, init_kmeans, threshold, verbose)
@@ -79,6 +79,7 @@ emMixHMMR <- function(X, Y, K, R, p, variance_type, order_constraint = TRUE, n_t
     # Initialization #
     ###################
 
+    variance_type <- match.arg(variance_type)
     param <- ParamMixHMMR$new(fData = fData, K = K, R = R, p = p, variance_type = variance_type)
     param$initMixFHMMR(order_constraint, init_kmeans, try_EM)
 

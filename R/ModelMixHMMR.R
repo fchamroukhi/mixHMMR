@@ -77,10 +77,10 @@ ModelMixHMMR <- setRefClass(
         colnames(betas) <- sapply(1:paramMixHMMR$R, function(x) paste0("Beta(R = ", x, ")"))
         print(betas, digits = digits)
 
-        cat(paste0(ifelse(paramMixHMMR$variance_type == variance_types$homoskedastic, "\n",
+        cat(paste0(ifelse(paramMixHMMR$variance_type == "homoskedastic", "\n",
                           "\nVariances:\n\n")))
         sigma2 <- data.frame(t(paramMixHMMR$sigma2_kr[, k]))
-        if (paramMixHMMR$variance_type == variance_types$homoskedastic) {
+        if (paramMixHMMR$variance_type == "homoskedastic") {
           colnames(sigma2) <- "Sigma2"
           print(sigma2, digits = digits, row.names = FALSE)
         } else {

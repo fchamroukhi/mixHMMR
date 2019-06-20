@@ -5,7 +5,8 @@ Version: 0.1.0
 Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
     email = "faicel.chamroukhi@unicaen.fr",
     comment = c(ORCID = "0000-0002-5894-3103")),
-    person("Marius", "Bartcus", role = c("aut")),
+    person("Marius", "Bartcus", role = c("aut"), 
+    email = "marius.bartcus@gmail.com"),
     person("Florian", "Lecocq", role = c("aut", "cre"),
     email = "florian.lecocq@outlook.com"))
 Description: Simultaneous model-based clustering and segmentation of heterogeneous and 
@@ -28,7 +29,6 @@ LinkingTo:
 Collate:
     mixHMMR-package.R
     RcppExports.R
-    enums.R
     utils.R
     mkStochastic.R
     kmeans.R

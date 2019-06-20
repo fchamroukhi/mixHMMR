@@ -31,7 +31,7 @@ library(mixHMMR)
 
 # Introduction
 
-**mixHMMR** is a contributed R package for clustering and segmentation. It provides functions for parameter estimation via the EM algorithm. This document gives a quick tour of **mixHMMR** (version `r packageVersion("mixHMMR")`) functionalities. It was written in R Markdown, using the [knitr](https://cran.r-project.org/package=knitr) package for production. 
+**mixHMMR** is a R package for clustering and segmentation. It provides functions for parameter estimation via the EM algorithm. This document gives a quick tour of **mixHMMR** (version `r packageVersion("mixHMMR")`) functionalities. It was written in R Markdown, using the [knitr](https://cran.r-project.org/package=knitr) package for production. 
 See `help(package="mixHMMR")` for further details and references provided by `citation("mixHMMR")`.
 
 # Load data
@@ -43,10 +43,10 @@ data("simulatedtimeseries")
 # Set up mixHMMR model parameters
 
 ```{r}
-K <- 3 # number of clusters
-R <- 3 # number of regimes/states
-p <- 2 # degree of the polynomial regression
-variance_type = variance_types$heteroskedastic
+K <- 3 # Number of clusters
+R <- 3 # Number of regimes/states
+p <- 2 # Degree of the polynomial regression
+variance_type <- "heteroskedastic" # "heteroskedastic" or "homoskedastic" model
 ```
 
 # Set up EM parameters
@@ -63,17 +63,17 @@ verbose = TRUE
 # Estimation
 
 ```{r}
-solution <- emMixHMMR(simulatedtimeseries$X, t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]), K, R, p, variance_type, ordered_states, n_tries, max_iter, init_kmeans, threshold, verbose)
+mixhmmr <- emMixHMMR(simulatedtimeseries$X, t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]), K, R, p, variance_type, ordered_states, n_tries, max_iter, init_kmeans, threshold, verbose)
 ```
 
 # Summary
 
 ```{r}
-solution$summary()
+mixhmmr$summary()
 ```
 
 # Plots
 
 ```{r}
-solution$plot()
+mixhmmr$plot()
 ```

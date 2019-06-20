@@ -50,10 +50,10 @@ library(mixHMMR)
 
 data("simulatedtimeseries")
 
-K <- 3 # number of clusters
-R <- 3 # number of regimes/states
-p <- 2 # degree of the polynomial regression
-variance_type = variance_types$heteroskedastic
+K <- 3 # Number of clusters
+R <- 3 # Number of regimes/states
+p <- 2 # Degree of the polynomial regression
+variance_type <- "heteroskedastic" # "heteroskedastic" or "homoskedastic" model
 
 ordered_states = TRUE
 n_tries = 1
@@ -62,7 +62,9 @@ init_kmeans = TRUE
 threshold = 1e-6
 verbose = TRUE
 
-solution <- emMixHMMR(simulatedtimeseries$X, t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]), K, R, p, variance_type, ordered_states, n_tries, max_iter, init_kmeans, threshold, verbose)
+mixhmmr <- emMixHMMR(simulatedtimeseries$X, t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]), K, R, p, variance_type, ordered_states, n_tries, max_iter, init_kmeans, threshold, verbose)
 
-solution$plot()
+mixhmmr$summary()
+
+mixhmmr$plot()
 ```
