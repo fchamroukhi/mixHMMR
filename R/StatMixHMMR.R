@@ -10,8 +10,10 @@ StatMixHMMR <- setRefClass(
     loglik = "numeric",
     stored_loglik = "list",
     cputime = "numeric",
-    klas = "matrix", # klas: [nx1 double]
-    z_ik = "matrix", # z_ik: [nxK]
+    klas = "matrix",
+    # klas: [nx1 double]
+    z_ik = "matrix",
+    # z_ik: [nxK]
     smoothed = "matrix",
     mean_curves = "array",
     BIC = "numeric",
@@ -19,13 +21,12 @@ StatMixHMMR <- setRefClass(
     ICL1 = "numeric"
   ),
   methods = list(
-
     initialize = function(paramMixHMMR = ParamMixHMMR()) {
 
       tau_ik <<- matrix(NA, paramMixHMMR$fData$n, paramMixHMMR$K)
       gamma_ikjr <<- array(NA, dim = c(paramMixHMMR$fData$n * paramMixHMMR$fData$m, paramMixHMMR$R, paramMixHMMR$K))
       log_w_k_fyi <<- matrix(NA, paramMixHMMR$fData$n, paramMixHMMR$K)
-      exp_num_trans <<- array(NA, dim = c(paramMixHMMR$R, paramMixHMMR$R, paramMixHMMR$fData$n, paramMixHMMR$K))
+      exp_num_trans <<- array(NA, dim = c( paramMixHMMR$R, paramMixHMMR$R, paramMixHMMR$fData$n, paramMixHMMR$K))
       exp_num_trans_from_l <<- array(NA, dim = c(paramMixHMMR$R, paramMixHMMR$fData$n, paramMixHMMR$K))
       loglik <<- -Inf
       stored_loglik <<- list()
@@ -41,6 +42,7 @@ StatMixHMMR <- setRefClass(
     },
 
     MAP = function() {
+
       N <- nrow(tau_ik)
       K <- ncol(tau_ik)
       ikmax <- max.col(tau_ik)
@@ -57,7 +59,6 @@ StatMixHMMR <- setRefClass(
       cputime <<- mean(cputime_total)
 
       for (k in 1:paramMixHMMR$K) {
-
         betakr <- paramMixHMMR$beta_kr[, , k]
         weighted_segments <- apply(gamma_ikjr[, , k] * (repmat(paramMixHMMR$phi, paramMixHMMR$fData$n, 1) %*% betakr), 1, sum)
         dim(weighted_segments) <- c(paramMixHMMR$fData$m, paramMixHMMR$fData$n)
@@ -65,7 +66,7 @@ StatMixHMMR <- setRefClass(
         smoothed[, k] <<- apply(weighted_clusters, 1, sum) / sum(tau_ik[, k])
       }
 
-      # BIC AIC et ICL*
+      # BIC AIC and ICL*
       BIC <<- loglik - (paramMixHMMR$nu * log(paramMixHMMR$fData$n) / 2)
       AIC <<- loglik - paramMixHMMR$nu
       # ICL*
@@ -77,7 +78,6 @@ StatMixHMMR <- setRefClass(
     },
 
     EStep = function(paramMixHMMR) {
-
       exp_num_trans_ck  <- array(0, dim = c(paramMixHMMR$R, paramMixHMMR$R, paramMixHMMR$fData$n))
       exp_num_trans_from_l_ck <- matrix(0, paramMixHMMR$R, paramMixHMMR$fData$n)
 
@@ -92,10 +92,10 @@ StatMixHMMR <- setRefClass(
         num_log_post_prob <- matrix(0, paramMixHMMR$fData$n, paramMixHMMR$K)
 
         for (i in 1:paramMixHMMR$fData$n) {
-          y_i <- paramMixHMMR$fData$Y[i, ]
+          y_i <- paramMixHMMR$fData$Y[i,]
 
           for (r in 1:paramMixHMMR$R) {
-            betakr <- beta_kr[, r]
+            betakr <- as.matrix(beta_kr)[, r]
 
             if (paramMixHMMR$variance_type == "homoskedastic") {
               sigma2_kr <- paramMixHMMR$sigma2_kr[, k]
@@ -107,7 +107,7 @@ StatMixHMMR <- setRefClass(
             }
             z <- ((y_i - t(paramMixHMMR$phi %*% betakr)) ^ 2) / sk
 
-            log_fkr_yij[r, ] <- -0.5 * matrix(1, 1, paramMixHMMR$fData$m) * (log(2 * pi) + log(sk)) - 0.5 * z # Log pdf yij | c_i = k et z_i = r
+            log_fkr_yij[r,] <- -0.5 * matrix(1, 1, paramMixHMMR$fData$m) * (log(2 * pi) + log(sk)) - 0.5 * z # Log pdf yij | c_i = k et z_i = r
 
           }
 
@@ -117,7 +117,7 @@ StatMixHMMR <- setRefClass(
 
 
           # Forwards backwards ( calcul de logProb(Yi)...)
-          fb <- forwardsBackwards(paramMixHMMR$pi_k[, k], paramMixHMMR$A_k[, , k], fkr_yij)
+          fb <- forwardsBackwards(as.matrix(paramMixHMMR$pi_k[, k]), as.matrix(paramMixHMMR$A_k[, , k]), fkr_yij)
 
           gamma_ik <- fb$tau_tk
           xi_ik <- fb$xi_tk

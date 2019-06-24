@@ -19,7 +19,6 @@ ParamMixHMMR <- setRefClass(
     mask = "matrix"
   ),
   methods = list(
-
     initialize = function(fData = FData(numeric(1), matrix(1)), K = 2, R = 1, p = 3, variance_type = "heteroskedastic") {
 
       if (variance_type == "homoskedastic") {
@@ -65,7 +64,7 @@ ParamMixHMMR <- setRefClass(
         solution <- kmeans(fData$Y, K, n_tries_kmeans, max_iter_kmeans, verbose_kmeans)
 
         for (k in 1:K) {
-          Yk <- fData$Y[solution$klas == k , ] #if kmeans
+          Yk <- fData$Y[solution$klas == k ,] #if kmeans
           initHmmRegression(Yk, k, R, phi, variance_type, order_constraint, try_algo)
         }
 
@@ -73,9 +72,9 @@ ParamMixHMMR <- setRefClass(
         ind <- sample(1:fData$n, fData$n)
         for (k in 1:K) {
           if (k < K) {
-            Yk <- fData$Y[ind[((k - 1) * round(fData$n / K) + 1):(k * round(fData$n / K))], ]
+            Yk <- fData$Y[ind[((k - 1) * round(fData$n / K) + 1):(k * round(fData$n / K))],]
           } else {
-            Yk <- fData$Y[ind[((k - 1) * round(fData$n / K) + 1):fData$n], ]
+            Yk <- fData$Y[ind[((k - 1) * round(fData$n / K) + 1):fData$n],]
           }
 
           initHmmRegression(Yk, k, R, phi, variance_type, order_constraint, try_algo)
@@ -114,24 +113,24 @@ ParamMixHMMR <- setRefClass(
 
       # 1. Initialization of the HMM parameters
       if (order_constraint) {
-        # Initialisation en tenant compte de la contrainte:
 
-        # Initialisation de la matrice des transitions
+        # Initialization taking into account the constraint:
+
+        # Initialization of the transition matrix
         maskM <- diag(R) # Mask of order 1
         for (r in 1:R - 1) {
-          ind <- which(maskM[r, ] != 0)
+          ind <- which(maskM[r,] != 0)
           maskM[r, ind + 1] <- 1
         }
 
-        # Initialisation de la loi initiale de la variable cachee
+        # Initialization of the initial distribution
         pi_k[, k] <<- c(1, matrix(0, R - 1, 1))
 
         A_k[, , k] <<- normalize(maskM, 2)$M
         mask <<- maskM
 
       } else {
-
-        # Initialisation de la loi initiale de la variable cachee
+        # Initialization of the initial distribution
         pi_k[, k] <<- c(1, matrix(0, R - 1, 1))
         A_k[, , k] <<- mkStochastic(matrix(runif(R), R, R))
       }
@@ -141,7 +140,6 @@ ParamMixHMMR <- setRefClass(
     },
 
     initRegressionParam = function(Y, k, R, phi, variance_type, try_algo) {
-
       n <- nrow(Y)
       m <- ncol(Y)
 
@@ -150,7 +148,6 @@ ParamMixHMMR <- setRefClass(
       }
 
       if (try_algo == 1) {
-
         zi <- round(m / R) - 1
         for (r in 1:R) {
           i <- (r - 1) * zi + 1
@@ -159,10 +156,10 @@ ParamMixHMMR <- setRefClass(
           Yij <- Y[, i:j]
           Yij <- matrix(t(Yij), ncol = 1, byrow = T)
 
-          phi_ij = phi[i:j, ]
-          Phi_ij = repmat(phi_ij, n, 1)
+          phi_ij <- phi[i:j,]
+          Phi_ij <- repmat(phi_ij, n, 1)
 
-          bk = solve(t(Phi_ij) %*% Phi_ij) %*% t(Phi_ij) %*% Yij
+          bk <- solve(t(Phi_ij) %*% Phi_ij) %*% t(Phi_ij) %*% Yij
           beta_kr[, r, k] <<- bk
 
           if (variance_type == "homoskedastic") {
@@ -170,8 +167,8 @@ ParamMixHMMR <- setRefClass(
             sigma2_kr[, k] <<- s / (n * m)
           } else {
             mk <- j - i + 1
-            z = Yij - Phi_ij %*% bk
-            sk = t(z) %*% z / (n * mk)
+            z <- Yij - Phi_ij %*% bk
+            sk <- t(z) %*% z / (n * mk)
             sigma2_kr[r, k] <<- sk
           }
         }
@@ -195,10 +192,10 @@ ParamMixHMMR <- setRefClass(
           Yij <- Y[, i:j]
           Yij <- matrix(t(Yij), ncol = 1, byrow = T)
 
-          phi_ij = phi[i:j, ]
-          Phi_ij = repmat(phi_ij, n, 1)
+          phi_ij <- phi[i:j,]
+          Phi_ij <- repmat(phi_ij, n, 1)
 
-          bk = solve(t(Phi_ij) %*% Phi_ij) %*% t(Phi_ij) %*% Yij
+          bk <- solve(t(Phi_ij) %*% Phi_ij) %*% t(Phi_ij) %*% Yij
           beta_kr[, r, k] <<- bk
 
           if (variance_type == "homoskedastic") {
@@ -206,8 +203,8 @@ ParamMixHMMR <- setRefClass(
             sigma2_kr[, k] <<- s / (n * m)
           } else {
             mk <- j - i + 1
-            z = Yij - Phi_ij %*% bk
-            sk = t(z) %*% z / (n * mk)
+            z <- Yij - Phi_ij %*% bk
+            sk <- t(z) %*% z / (n * mk)
             sigma2_kr[r, k] <<- sk
           }
         }
@@ -222,7 +219,6 @@ ParamMixHMMR <- setRefClass(
       exp_num_trans_k <- array(0, dim = c(R, R, fData$n))
 
       for (k in 1:K) {
-
         if (variance_type == "homoskedastic") {
           s <- 0
         }
@@ -236,11 +232,10 @@ ParamMixHMMR <- setRefClass(
 
         # Maximization of Q3 w.r.t A^g
         for (r in 1:R) {
-
           if (fData$n == 1) {
-            exp_num_trans_k[r, , ] <- t(matrix(1, R, 1) %*% weights_cluster_k) * drop(statMixHMM$exp_num_trans[r, , , k])
+            exp_num_trans_k[r, ,] <- t(matrix(1, R, 1) %*% weights_cluster_k) * drop(statMixHMM$exp_num_trans[r, , , k])
           } else {
-            exp_num_trans_k[r, , ] <- (matrix(1, R, 1) %*% t(weights_cluster_k)) * drop(statMixHMM$exp_num_trans[r, , , k])
+            exp_num_trans_k[r, ,] <- (matrix(1, R, 1) %*% t(weights_cluster_k)) * drop(statMixHMM$exp_num_trans[r, , , k])
           }
         }
 
@@ -257,7 +252,7 @@ ParamMixHMMR <- setRefClass(
           A_k[, , k] <<- mkStochastic(mask * A_k[, , k])
         }
 
-        # Maximisation de Q4 par rapport aux betak et sigmak
+        # Maximisation of Q4 w.r.t with betak et sigmak
 
         Ng <- apply(statMixHMM$tau_ik, 2, sum) # Nbr of individuals within the cluster k ,k=1...K estimated at iteration q
         ng <- Ng # Cardinal nbr of the cluster k
@@ -268,20 +263,21 @@ ParamMixHMMR <- setRefClass(
         # Secondly, the m observations of each sequence are weighted by the
         # weights of each segment k (post prob of the segments for each
         # cluster g)
+
         gamma_ijk <- statMixHMM$gamma_ikjr[, , k] # [n*m R]
 
-        nm_kr <- apply(gamma_ijk, 2, sum) # Cardinal nbr of the segments r,r=1,...,R within each cluster k, at iteration q
+        nm_kr <- apply(as.matrix(gamma_ijk), 2, sum) # Cardinal nbr of the segments r,r=1,...,R within each cluster k, at iteration q
 
         for (r in 1:R) {
           nmkr <- nm_kr[r] # Cardinal nbr of segment k for the cluster k
 
-          weights_seg_k <- matrix(gamma_ijk[, r])
+          weights_seg_k <- matrix(as.matrix(gamma_ijk)[, r])
 
           Xkr <- (sqrt(weights_cluster_k * weights_seg_k) %*% matrix(1, 1, p + 1)) * repmat(phi, fData$n, 1) # [n*m x (p+1)]
           Ykr <- (sqrt(weights_cluster_k * weights_seg_k)) * fData$vecY # [n*m x 1]
 
           # Weighted least squares: maximization w.r.t beta_kr
-          beta_kr[, r, k] <<- solve(t(Xkr) %*% Xkr) %*% t(Xkr) %*% Ykr # Maximisation par rapport aux betakr
+          beta_kr[, r, k] <<- solve(t(Xkr) %*% Xkr) %*% t(Xkr) %*% Ykr # Maximization w.r.t beta_kr
 
           # Maximization w.r.t sigmak :
           z <- sqrt(weights_cluster_k * weights_seg_k) * (fData$vecY - repmat(phi, fData$n, 1) %*% beta_kr[, r, k])
