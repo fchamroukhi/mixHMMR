@@ -54,7 +54,7 @@ ModelMixHMMR <- setRefClass(
       print(table(statMixHMMR$klas))
 
       cat("\nMixing probabilities (cluster weights):\n")
-      pro <- data.frame(t(paramMixHMMR$w_k))
+      pro <- data.frame(t(paramMixHMMR$alpha))
       colnames(pro) <- 1:paramMixHMMR$K
       print(pro, digits = digits, row.names = FALSE)
 
@@ -73,12 +73,12 @@ ModelMixHMMR <- setRefClass(
           row.names = "1"
         }
 
-        betas <- data.frame(paramMixHMMR$beta_kr[, , k], row.names = row.names)
+        betas <- data.frame(paramMixHMMR$beta[, , k], row.names = row.names)
         colnames(betas) <- sapply(1:paramMixHMMR$R, function(x) paste0("Beta(R = ", x, ")"))
         print(betas, digits = digits)
 
         cat(paste0(ifelse(paramMixHMMR$variance_type == "homoskedastic", "\n", "\nVariances:\n\n")))
-        sigma2 <- data.frame(t(paramMixHMMR$sigma2_kr[, k]))
+        sigma2 <- data.frame(t(paramMixHMMR$sigma2[, k]))
         if (paramMixHMMR$variance_type == "homoskedastic") {
           colnames(sigma2) <- "Sigma2"
           print(sigma2, digits = digits, row.names = FALSE)

@@ -59,7 +59,7 @@ StatMixHMMR <- setRefClass(
       cputime <<- mean(cputime_total)
 
       for (k in 1:paramMixHMMR$K) {
-        betakr <- paramMixHMMR$beta_kr[, , k]
+        betakr <- paramMixHMMR$beta[, , k]
         weighted_segments <- apply(gamma_ikjr[, , k] * (repmat(paramMixHMMR$phi, paramMixHMMR$fData$n, 1) %*% betakr), 1, sum)
         dim(weighted_segments) <- c(paramMixHMMR$fData$m, paramMixHMMR$fData$n)
         weighted_clusters <- (matrix(1, paramMixHMMR$fData$m, 1) %*% t(tau_ik[, k])) * weighted_segments
@@ -88,7 +88,7 @@ StatMixHMMR <- setRefClass(
 
         Li <- matrix(0, paramMixHMMR$fData$n, 1) # To store the loglik for each example (curve)
 
-        beta_kr <- paramMixHMMR$beta_kr[, , k]
+        beta_kr <- paramMixHMMR$beta[, , k]
         num_log_post_prob <- matrix(0, paramMixHMMR$fData$n, paramMixHMMR$K)
 
         for (i in 1:paramMixHMMR$fData$n) {
@@ -98,11 +98,11 @@ StatMixHMMR <- setRefClass(
             betakr <- as.matrix(beta_kr)[, r]
 
             if (paramMixHMMR$variance_type == "homoskedastic") {
-              sigma2_kr <- paramMixHMMR$sigma2_kr[, k]
+              sigma2_kr <- paramMixHMMR$sigma2[, k]
               sk <- sigma2_kr
             }
             else{
-              sigma2_kr <- paramMixHMMR$sigma2_kr[, k]
+              sigma2_kr <- paramMixHMMR$sigma2[, k]
               sk <- sigma2_kr[r]
             }
             z <- ((y_i - t(paramMixHMMR$phi %*% betakr)) ^ 2) / sk
@@ -117,7 +117,7 @@ StatMixHMMR <- setRefClass(
 
 
           # Forwards backwards ( calcul de logProb(Yi)...)
-          fb <- forwardsBackwards(as.matrix(paramMixHMMR$pi_k[, k]), as.matrix(paramMixHMMR$A_k[, , k]), fkr_yij)
+          fb <- forwardsBackwards(as.matrix(paramMixHMMR$prior[, k]), as.matrix(paramMixHMMR$trans_mat[, , k]), fkr_yij)
 
           gamma_ik <- fb$tau_tk
           xi_ik <- fb$xi_tk
@@ -138,8 +138,8 @@ StatMixHMMR <- setRefClass(
         exp_num_trans[, , , k] <<- exp_num_trans_ck # [R R n K]
 
         # For computing the global loglik
-        # w_k_fyi[, k] <- paramMixHMMR$w_k[k] * exp(Li)#[nx1]
-        log_w_k_fyi[, k] <<- log(paramMixHMMR$w_k[k]) + Li
+        # w_k_fyi[, k] <- paramMixHMMR$alpha[k] * exp(Li)#[nx1]
+        log_w_k_fyi[, k] <<- log(paramMixHMMR$alpha[k]) + Li
       }
 
       log_w_k_fyi <<- pmin(log_w_k_fyi, log(.Machine$double.xmax))
