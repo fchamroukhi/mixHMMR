@@ -43,39 +43,37 @@ browseVignettes("mixHMMR")
 ``` r
 library(mixHMMR)
 
-data("simulatedtimeseries")
+data("toydataset")
 
 K <- 3 # Number of clusters
 R <- 3 # Number of regimes/states
 p <- 2 # Degree of the polynomial regression
 variance_type <- "heteroskedastic" # "heteroskedastic" or "homoskedastic" model
 
-ordered_states = TRUE
-n_tries = 1
-max_iter = 1000
-init_kmeans = TRUE
-threshold = 1e-6
-verbose = TRUE
+ordered_states <- TRUE
+n_tries <- 1
+max_iter <- 1000
+init_kmeans <- TRUE
+threshold <- 1e-6
+verbose <- TRUE
 
-mixhmmr <- emMixHMMR(simulatedtimeseries$X, t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]), K, R, p, variance_type, ordered_states, n_tries, max_iter, init_kmeans, threshold, verbose)
-#> EM: Iteration : 1 || log-likelihood : -27603.7693242885
-#> EM: Iteration : 2 || log-likelihood : -22464.3472396589
-#> EM: Iteration : 3 || log-likelihood : -22229.1696060833
-#> EM: Iteration : 4 || log-likelihood : -22212.3560575002
-#> EM: Iteration : 5 || log-likelihood : -22204.7382239976
-#> EM: Iteration : 6 || log-likelihood : -22192.3908663086
-#> EM: Iteration : 7 || log-likelihood : -22179.0984264533
-#> EM: Iteration : 8 || log-likelihood : -22161.3266480818
-#> EM: Iteration : 9 || log-likelihood : -22140.2069698656
-#> EM: Iteration : 10 || log-likelihood : -22118.2274362038
-#> EM: Iteration : 11 || log-likelihood : -22091.4388392804
-#> EM: Iteration : 12 || log-likelihood : -21996.798418692
-#> EM: Iteration : 13 || log-likelihood : -21866.4806541681
-#> EM: Iteration : 14 || log-likelihood : -21826.8183365824
-#> EM: Iteration : 15 || log-likelihood : -21804.0499569094
-#> EM: Iteration : 16 || log-likelihood : -21802.7361620057
-#> EM: Iteration : 17 || log-likelihood : -21802.6973948926
-#> EM: Iteration : 18 || log-likelihood : -21802.6958496405
+mixhmmr <- emMixHMMR(toydataset$x, t(toydataset[,2:ncol(toydataset)]), K, R, p,
+                     variance_type, ordered_states, init_kmeans, n_tries, max_iter,
+                     threshold, verbose)
+#> EM: Iteration : 1 || log-likelihood : -18777.2031829953
+#> EM: Iteration : 2 || log-likelihood : -15126.4977686182
+#> EM: Iteration : 3 || log-likelihood : -15108.0257218485
+#> EM: Iteration : 4 || log-likelihood : -15099.3886708306
+#> EM: Iteration : 5 || log-likelihood : -15096.2232155737
+#> EM: Iteration : 6 || log-likelihood : -15094.6653710273
+#> EM: Iteration : 7 || log-likelihood : -15093.146042446
+#> EM: Iteration : 8 || log-likelihood : -15092.5333943885
+#> EM: Iteration : 9 || log-likelihood : -15092.3574425426
+#> EM: Iteration : 10 || log-likelihood : -15092.2739302088
+#> EM: Iteration : 11 || log-likelihood : -15092.2246217209
+#> EM: Iteration : 12 || log-likelihood : -15092.1936060862
+#> EM: Iteration : 13 || log-likelihood : -15092.1737135961
+#> EM: Iteration : 14 || log-likelihood : -15092.1608712011
 
 mixhmmr$summary()
 #> ------------------------
@@ -84,16 +82,16 @@ mixhmmr$summary()
 #> 
 #> MixHMMR model with K = 3 clusters and R = 3 regimes:
 #> 
-#>  log-likelihood nu      AIC       BIC       ICL
-#>        -21802.7 62 -21864.7 -21923.97 -21923.97
+#>  log-likelihood nu       AIC      BIC      ICL
+#>       -15092.16 62 -15154.16 -15197.6 -15197.6
 #> 
 #> Clustering table:
 #>  1  2  3 
-#> 20 15 15 
+#> 10 10 10 
 #> 
 #> Mixing probabilities (cluster weights):
-#>    1   2   3
-#>  0.4 0.3 0.3
+#>          1         2         3
+#>  0.3333333 0.3333333 0.3333333
 #> 
 #> 
 #> --------------------
@@ -101,45 +99,45 @@ mixhmmr$summary()
 #> 
 #> Regression coefficients:
 #> 
-#>       Beta(R = 1)   Beta(R = 2)   Beta(R = 3)
-#> 1   10.0608592226  7.154392e+00  1.099150e+01
-#> X^1 -0.0041688587 -2.054854e-03 -1.539832e-02
-#> X^2  0.0000585695  6.573220e-06  2.938932e-05
+#>     Beta(R = 1) Beta(R = 2) Beta(R = 3)
+#> 1     6.8643627    64.43719    6.218654
+#> X^1   1.2876344  -462.55911   -3.949075
+#> X^2  -0.1413059   893.93553    1.560385
 #> 
 #> Variances:
 #> 
 #>  Sigma2(R = 1) Sigma2(R = 2) Sigma2(R = 3)
-#>      0.9272584     0.9732739      1.075292
+#>      0.9770486     0.8116849      1.029812
 #> 
 #> --------------------
 #> Cluster 2 (K = 2):
 #> 
 #> Regression coefficients:
 #> 
-#>       Beta(R = 1)   Beta(R = 2)   Beta(R = 3)
-#> 1    8.078276e+00  1.041280e+01 -1.0174961243
-#> X^1 -3.665485e-03  8.028359e-03  0.0614216445
-#> X^2  4.327332e-05 -2.581304e-05 -0.0001168651
+#>     Beta(R = 1) Beta(R = 2) Beta(R = 3)
+#> 1      6.002044    13.62910    4.934443
+#> X^1    9.248449   -41.99225    4.615747
+#> X^2  -41.739255    47.63765   -2.884340
 #> 
 #> Variances:
 #> 
 #>  Sigma2(R = 1) Sigma2(R = 2) Sigma2(R = 3)
-#>      0.9593165       0.97573      1.031369
+#>      0.9961152      1.008064      1.006024
 #> 
 #> --------------------
 #> Cluster 3 (K = 3):
 #> 
 #> Regression coefficients:
 #> 
-#>       Beta(R = 1)   Beta(R = 2)   Beta(R = 3)
-#> 1    8.099465e+00  8.0594251376 21.7881531429
-#> X^1 -4.282857e-03  0.0432660127 -0.0922833598
-#> X^2  4.141703e-05 -0.0001555985  0.0001790529
+#>     Beta(R = 1) Beta(R = 2) Beta(R = 3)
+#> 1      5.139985     2.17167    4.380359
+#> X^1   -3.125108    21.90556    1.459464
+#> X^2    9.744229   -24.65557   -0.852382
 #> 
 #> Variances:
 #> 
 #>  Sigma2(R = 1) Sigma2(R = 2) Sigma2(R = 3)
-#>      0.9787244      1.011285      1.089561
+#>      0.9509166      1.052753     0.9495063
 
 mixhmmr$plot()
 ```

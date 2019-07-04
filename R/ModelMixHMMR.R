@@ -1,3 +1,12 @@
+#' A Reference Class which represents a fitted MixHMMR model.
+#'
+#' ModelMixHMMR represents an estimated MixHMMR model.
+#'
+#' @field paramMixHMMR A [ParamMixHMMR][ParamMixHMMR] object. It contains the
+#'   estimated values of the parameters.
+#' @field statMixHMMR A [StatMixHMMR][StatMixHMMR] object. It contains all the
+#'   statistics associated to the MixHMMR model.
+#' @seealso [ParamMixHMMR], [StatMixHMMR]
 #' @export
 ModelMixHMMR <- setRefClass(
   "ModelMixHMMR",
@@ -7,6 +16,7 @@ ModelMixHMMR <- setRefClass(
   ),
   methods = list(
     plot = function() {
+      "Plot method."
 
       # yaxislim <- c(min(paramMixHMMR$fData$Y) - 2 * mean(sqrt(apply(paramMixHMMR$fData$Y, 1, var))), max(paramMixHMMR$fData$Y) + 2 * mean(sqrt(apply(paramMixHMMR$fData$Y, 1, var))))
 
@@ -21,11 +31,13 @@ ModelMixHMMR <- setRefClass(
       for (k in 1:paramMixHMMR$K) {
         matplot(paramMixHMMR$fData$X, t(paramMixHMMR$fData$Y[statMixHMMR$klas == k,]), type = "l", lty = "dotted", col = colorsvec[k], xlab = "x", ylab = "y(t)")
         title(main = sprintf("Cluster %1.1i", k))
-        lines(statMixHMMR$smoothed[, k], lwd = 1.5)
+        lines(paramMixHMMR$fData$X, statMixHMMR$smoothed[, k], lwd = 1.5)
       }
     },
 
     summary = function() {
+      "Summary method."
+
       digits = getOption("digits")
 
       title <- paste("Fitted mixHMMR model")
@@ -73,7 +85,13 @@ ModelMixHMMR <- setRefClass(
           row.names = "1"
         }
 
-        betas <- data.frame(paramMixHMMR$beta[, , k], row.names = row.names)
+        if (paramMixHMMR$p > 0) {
+          row.names = c("1", sapply(1:paramMixHMMR$p, function(x) paste0("X^", x)))
+          betas <- data.frame(paramMixHMMR$beta[, , k], row.names = row.names)
+        } else {
+          row.names = "1"
+          betas <- data.frame(t(paramMixHMMR$beta[, , k]), row.names = row.names)
+        }
         colnames(betas) <- sapply(1:paramMixHMMR$R, function(x) paste0("Beta(R = ", x, ")"))
         print(betas, digits = digits)
 

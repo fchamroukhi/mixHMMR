@@ -1,67 +1,53 @@
+#' emMixHMMR is used to fit a MixHMMR model.
+#'
+#' emMixHMMR is used to fit a MixHMMR model. The estimation method is performed by
+#' the Expectation-Maximization algorithm.
+#'
+#' @details emMixHMMR function implements the EM algorithm. This function starts
+#'   with an initialization of the parameters done by the method `initParam` of
+#'   the class [ParamMixHMMR][ParamMixHMMR], then it alternates between the E-Step
+#'   (method of the class [StatMixHMMR][StatMixHMMR]) and the M-Step (method of
+#'   the class [ParamMixHMMR][ParamMixHMMR]) until convergence (until the relative
+#'   variation of log-likelihood between two steps of the EM algorithm is less
+#'   than the `threshold` parameter).
+#'
+#' @param X Numeric vector of length \emph{m} representing the covariates/inputs
+#'   \eqn{x_{1},\dots,x_{m}}.
+#' @param Y Matrix of size \eqn{(n, m)} representing the observed
+#'   responses/outputs. `Y` consists of \emph{n} functions of `X` observed at
+#'   points \eqn{1,\dots,m}.
+#' @param K The number of clusters (Number of HMMR models).
+#' @param R The number of regimes (HMMR components) for each cluster.
+#' @param p Optional. The order of the polynomial regression. By default, `p` is
+#'   set at 3.
+#' @param variance_type Optional character indicating if the model is
+#'   "homoskedastic" or "heteroskedastic". By default the model is
+#'   "heteroskedastic".
+#' @param order_constraint Optional. A logical indicating whether or not a mask
+#'   of order one should be applied to the transition matrix of the Markov
+#'   chain. For the purpose of segmentation, it must be set to `TRUE` (which is
+#'   the default value).
+#' @param init_kmeans Optional. A logical indicating whether or not the curve
+#'   partition should be initialized by the K-means algorithm. Otherwise the
+#'   curve partition is initialized randomly.
+#' @param n_tries Optional. Number of runs of the EM algorithm. The solution
+#'   providing the highest log-likelihood will be returned.
+#'
+#'   If `n_tries` > 1, then for the first run, parameters are initialized by
+#'   uniformly segmenting the data into K segments, and for the next runs,
+#'   parameters are initialized by randomly segmenting the data into K
+#'   contiguous segments.
+#' @param max_iter Optional. The maximum number of iterations for the EM
+#'   algorithm.
+#' @param threshold Optional. A numeric value specifying the threshold for the
+#'   relative difference of log-likelihood between two steps of the EM as
+#'   stopping criteria.
+#' @param verbose Optional. A logical value indicating whether or not values of
+#'   the log-likelihood should be printed during EM iterations.
+#' @return EM returns an object of class [ModelMixHMMR][ModelMixHMMR].
+#' @seealso [ModelMixHMMR], [ParamMixHMMR], [StatMixHMMR]
 #' @export
-emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "homoskedastic"), order_constraint = TRUE, n_tries = 1, max_iter = 1000, init_kmeans = TRUE, threshold = 1e-6, verbose = TRUE) {
-    #   MixFHMMR =  seq_clust_MixFHMMR(data, K, R, p,fs, variance_type,...
-    #               order_constraint, total_EM_tries, max_iter_EM, init_kmeans, threshold, verbose)
-    # Learn a mixture of Hidden Markov Moedel Regression for curve clustering by EM
-    #
-    #
-    # Inputs :
-    #
-    #          1. data :  n curves each curve is composed of m points : dim(Y)=[n m]
-    #                * Each curve is observed during the interval [0,T]=[t_1,...,t_m]
-    #                * t{j}-t_{j-1} = 1/fs (fs: sampling period)
-    #          2. K: number of clusters
-    #          3. R: Number of polynomial regression components (regimes)
-    #          4. p: degree of the polynomials
-    # Options:
-    #          1. order_constraint: set to one if ordered segments (by default 0)
-    #          2. variance_type of the poynomial models for each cluster (free or
-    #          common, by defalut free)
-    #          3. init_kmeans: initialize the curve partition by Kmeans
-    #          4. total_EM_tries :  (the solution providing the highest log-lik is chosen
-    #          5. max_iter_EM
-    #          6. threshold: by defalut 1e-6
-    #          7. verbose : set to 1 for printing the "complete-log-lik"  values during
-    #          the EM iterations (by default verbose_EM = 0)
-    #
-    # Outputs :
-    #
-    #          MixFHMMR : structure containing the following fields:
-    #
-    #          1. param : a structure containing the model parameters
-    #                       ({Wk},{alpha_k}, {beta_kr},{sigma_kr}) for k=1,...,K and k=1...R.
-    #              1.1 Wk = (Wk1,...,w_kR-1) parameters of the logistic process:
-    #                  matrix of dimension [(q+1)x(R-1)] with q the order of logistic regression.
-    #              1.2 beta_k = (beta_k1,...,beta_kR) polynomial regression coefficient vectors: matrix of
-    #                  dimension [(p+1)xR] p being the polynomial  degree.
-    #              1.3 sigma_k = (sigma_k1,...,sigma_kR) : the variances for the R regmies. vector of dimension [Rx1]
-    #              1.4 pi_jkr :logistic proportions for cluster g
-    #
-    #          2. paramter_vector: parameter vector of the model: Psi=({Wg},{alpha_k},{beta_kr},{sigma_kr})
-    #                  column vector of dim [nu x 1] with nu = nbr of free parametres
-    #          3. h_ik = prob(curve|cluster_k) : post prob (fuzzy segmentation matrix of dim [nxK])
-    #          4. c_ik : Hard partition obtained by the AP rule :  c_{ik} = 1
-    #                    if and only c_i = arg max_k h_ik (k=1,...,K)
-    #          5. klas : column vector of cluster labels
-    #          6. tau_ijkr prob(y_{ij}|kth_segment,cluster_k), fuzzy
-    #          segmentation for the cluster g. matrix of dimension
-    #          [nmxR] for each g  (g=1,...,K).
-    #          7. Ex_k: curve expectation: sum of the polynomial components beta_kr ri weighted by
-    #             the logitic probabilities pij_kr: Ex_k(j) = sum_{k=1}^R pi_jkr beta_kr rj, j=1,...,m. Ex_k
-    #              is a column vector of dimension m for each g.
-    #          8. loglik : at convergence of the EM algo
-    #          9. stored_com-loglik : vector of stored valued of the
-    #          comp-log-lik at each EM teration
-    #
-    #          10. BIC value = loglik - nu*log(nm)/2.
-    #          11. ICL value = comp-loglik_star - nu*log(nm)/2.
-    #          12. AIC value = loglik - nu.
-    #          13. log_alphag_fg_xij
-    #          14. polynomials
-    #          15. weighted_polynomials
-    #
-    #
-    #############################################################################################
+emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "homoskedastic"), order_constraint = TRUE, init_kmeans = TRUE, n_tries = 1, max_iter = 1000, threshold = 1e-6, verbose = TRUE) {
 
     fData <- FData$new(X = X, Y = Y)
 
@@ -71,17 +57,15 @@ emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "h
 
     while (try_EM < n_tries) {
       try_EM <- try_EM + 1
-      if (n_tries > 1) {
-        if (verbose) {
-          cat(paste0("EM try number: ", try_EM + 1, "\n\n"))
-        }
+      if (n_tries > 1 && verbose) {
+        cat(paste0("EM try number: ", try_EM, "\n\n"))
       }
       start_time <- Sys.time()
 
       # Initialization
       variance_type <- match.arg(variance_type)
       param <- ParamMixHMMR$new(fData = fData, K = K, R = R, p = p, variance_type = variance_type)
-      param$initMixFHMMR(order_constraint, init_kmeans, try_EM)
+      param$initParam(order_constraint, init_kmeans, try_EM)
 
       iter <- 0
       converged <- FALSE
@@ -108,8 +92,7 @@ emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "h
           warning(paste0("EM log-likelihood is decreasing from ", prev_loglik, "to ", stat$loglik, " !"))
         }
 
-        converged <-
-          (abs((stat$loglik - prev_loglik) / prev_loglik) < threshold)
+        converged <- (abs((stat$loglik - prev_loglik) / prev_loglik) < threshold)
         if (is.na(converged)) {
           converged <- FALSE
         } # Basically for the first iteration when prev_loglik is Inf
@@ -128,18 +111,14 @@ emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "h
         best_loglik <- stat$loglik
       }
 
-      if (try_EM > 1) {
-        if (verbose) {
-          cat(paste0("Log-likelihood at convergence:", stat$loglik))
-        }
+      if (n_tries > 1 && verbose) {
+        cat(paste0("Max value of the log-likelihood: ", stat$loglik, "\n\n"))
       }
 
     }
 
-    if (try_EM > 1) {
-      if (verbose) {
-        cat(paste0("Best value of the log-likelihood: ", statSolution$loglik, "\n"))
-      }
+    if (n_tries > 1 && verbose) {
+      cat(paste0("Best value of the log-likelihood: ", statSolution$loglik, "\n"))
     }
 
     # Finding the curve partition by using the MAP rule

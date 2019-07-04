@@ -1,3 +1,34 @@
+#' A Reference Class which contains parameters of a MixHMMR model.
+#'
+#' ParamMixHMMR contains all the parameters of a MixHMMR model.
+#'
+#' @field fData [FData][FData] object representing the sample (covariates/inputs
+#'   `X` and observed responses/outputs `Y`).
+#' @field K The number of clusters (Number of HMMR models).
+#' @field R The number of regimes (HMMR components) for each cluster.
+#' @field p The order of the polynomial regression.
+#' @field variance_type Character indicating if the model is homoskedastic
+#'   (`variance_type = "homoskedastic"`) or heteroskedastic (`variance_type =
+#'   "heteroskedastic"`). By default the model is heteroskedastic.
+#' @field alpha Cluster weights. Matrix of dimension \eqn{(K, 1)}.
+#' @field prior The prior probabilities of the Markov chains. `prior` is a
+#'   matrix of dimension \eqn{(R, K)}. The k-th column represents the prior
+#'   distribution of the Markov chain asociated to the cluster k.
+#' @field trans_mat The transition matrices of the Markov chains. `trans_mat` is
+#'   an array of dimension \eqn{(R, R, K)}.
+#' @field mask Mask applied to the transition matrices `trans_mat`. By default,
+#'   a mask of order one is applied.
+#' @field beta Parameters of the polynomial regressions. `beta` is an array of
+#'   dimension \eqn{(p + 1, R, K)}, with `p` the order of the polynomial
+#'   regression. `p` is fixed to 3 by default.
+#' @field sigma2 The variances for the `K` clusters. If MixHMMR model is
+#'   heteroskedastic (`variance_type = "heteroskedastic"`) then `sigma2` is a
+#'   matrix of size \eqn{(R, K)} (otherwise MixHMMR model is homoskedastic
+#'   (`variance_type = "homoskedastic"`) and `sigma2` is a matrix of size
+#' @field nu The degree of freedom of the MixHMMR model representing the
+#'   complexity of the model.
+#' @field phi A list giving the regression design matrices for the polynomial
+#'   and the logistic regressions.
 #' @export
 ParamMixHMMR <- setRefClass(
   "ParamMixHMMR",
@@ -51,12 +82,54 @@ ParamMixHMMR <- setRefClass(
 
     },
 
-    initMixFHMMR = function(order_constraint = TRUE, init_kmeans = TRUE, try_algo = 1) {
+    initParam = function(order_constraint = TRUE, init_kmeans = TRUE, try_algo = 1) {
+      "Method to initialize parameters \\code{alpha}, \\code{prior}, \\code{trans_mat},
+      \\code{beta} and \\code{sigma2}.
+
+      If \\code{init_kmeans = TRUE} then the curve partition is initialized by
+      the K-means algorithm. Otherwise the curve partition is initialized
+      randomly.
+
+      If \\code{try_algo = 1} then \\code{beta} and \\code{sigma2} are
+      initialized by segmenting  the time series \\code{Y} uniformly into
+      \\code{R} contiguous segments. Otherwise, \\code{beta} and
+      \\code{sigma2} are initialized by segmenting randomly the time series
+      \\code{Y} into \\code{R} segments."
 
       # 1. Initialization of cluster weights
       alpha <<- 1 / K * matrix(1, K, 1)
 
-      # Initialization of the model parameters for each cluster
+      # Initialization of the initial distributions and the transition matrices
+      if (order_constraint) {
+
+        # Initialization taking into account the constraint:
+
+        # Initialization of the transition matrix
+        maskM <- diag(R) # Mask of order 1
+        if (R > 1) {
+          for (r in 1:(R - 1)) {
+            ind <- which(maskM[r,] != 0)
+            maskM[r, ind + 1] <- 1
+          }
+        }
+
+        # Initialization of the initial distribution
+        for (k in 1:K) {
+          prior[, k] <<- c(1, matrix(0, R - 1, 1))
+          trans_mat[, , k] <<- normalize(maskM, 2)$M
+        }
+
+        mask <<- maskM
+
+      } else {
+
+        for (k in 1:K) {
+          prior[, k] <<- c(1, matrix(0, R - 1, 1))
+          trans_mat[, , k] <<- mkStochastic(matrix(runif(R), R, R))
+        }
+      }
+
+      # 2. Initialisation of regression coefficients and variances
       if (init_kmeans) {
         max_iter_kmeans <- 400
         n_tries_kmeans <- 20
@@ -65,7 +138,7 @@ ParamMixHMMR <- setRefClass(
 
         for (k in 1:K) {
           Yk <- fData$Y[solution$klas == k ,] #if kmeans
-          initHmmRegression(Yk, k, R, phi, variance_type, order_constraint, try_algo)
+          initRegressionParam(Yk, k, R, phi, variance_type, try_algo)
         }
 
       } else {
@@ -77,69 +150,15 @@ ParamMixHMMR <- setRefClass(
             Yk <- fData$Y[ind[((k - 1) * round(fData$n / K) + 1):fData$n],]
           }
 
-          initHmmRegression(Yk, k, R, phi, variance_type, order_constraint, try_algo)
+          initRegressionParam(Yk, k, R, phi, variance_type, try_algo)
 
         }
       }
-    },
-
-    initHmmRegression = function(Y, k, R, phi, variance_type, order_constraint = TRUE, try_algo) {
-      # initHmmRegression estime les parametres initiaux d'un modele de regression
-      # processus markovien cache ou la loi conditionnelle des observations est une gaussienne
-      #
-      # Entrees :
-      #
-      #        data  = n sequences each sequence is of m points
-      #        signaux les observations sont monodimentionnelles)
-      #        K : nbre d'etats (classes) caches
-      #        duree_signal :  duree du signal en secondes
-      #        fs : frequence d'echantiloonnage des signaux en Hz
-      #        ordre_reg : ordre de regression polynomiale
-      #
-      # Sorties :
-      #
-      #         param : parametres initiaux du modele. structure
-      #         contenant les champs: para: structrure with the fields:
-      #         * le HMM initial
-      #         1. initial_prob (k) = Pr(Z(1) = k) avec k=1,...,K. loi initiale de z.
-      #         2. trans_mat(\ell,k) = Pr(z(i)=k | z(i-1)=\ell) : matrice des transitions
-      #         *
-      #         3.betak : le vecteur parametre de regression associe a la classe k.
-      #         vecteur colonne de dim [(p+1)x1]
-      #         4. sigmak(k) = variance de x(i) sachant z(i)=k; sigmak(j) =
-      #         sigma^2_k.
-      #
-      ################################################################################
-
-      # 1. Initialization of the HMM parameters
-      if (order_constraint) {
-
-        # Initialization taking into account the constraint:
-
-        # Initialization of the transition matrix
-        maskM <- diag(R) # Mask of order 1
-        for (r in 1:R - 1) {
-          ind <- which(maskM[r,] != 0)
-          maskM[r, ind + 1] <- 1
-        }
-
-        # Initialization of the initial distribution
-        prior[, k] <<- c(1, matrix(0, R - 1, 1))
-
-        trans_mat[, , k] <<- normalize(maskM, 2)$M
-        mask <<- maskM
-
-      } else {
-        # Initialization of the initial distribution
-        prior[, k] <<- c(1, matrix(0, R - 1, 1))
-        trans_mat[, , k] <<- mkStochastic(matrix(runif(R), R, R))
-      }
-
-      # 2. Initialisation of regression coefficients and variances
-      initRegressionParam(Y, k, R, phi, variance_type, try_algo)
     },
 
     initRegressionParam = function(Y, k, R, phi, variance_type, try_algo) {
+      "Initialize \\code{beta} and \\code{sigma2} for the cluster \\code{k}."
+
       n <- nrow(Y)
       m <- ncol(Y)
 
@@ -212,6 +231,9 @@ ParamMixHMMR <- setRefClass(
     },
 
     MStep = function(statMixHMM, order_constraint = TRUE) {
+      "Method which implements the M-step of the EM algorithm to learn the
+      parameters of the MixHMMR model based on statistics provided by
+      \\code{statMixHMMR} (which contains the E-step)."
 
       # Maximization of Q1 w.r.t alpha
       alpha <<- matrix(apply(statMixHMM$tau_ik, 2, sum)) / fData$n

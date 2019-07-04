@@ -37,7 +37,7 @@ See `help(package="mixHMMR")` for further details and references provided by `ci
 # Load data
 
 ```{r}
-data("simulatedtimeseries")
+data("toydataset")
 ```
 
 # Set up mixHMMR model parameters
@@ -52,18 +52,20 @@ variance_type <- "heteroskedastic" # "heteroskedastic" or "homoskedastic" model
 # Set up EM parameters
 
 ```{r}
-ordered_states = TRUE
-n_tries = 1
-max_iter = 1000
-init_kmeans = TRUE
-threshold = 1e-6
-verbose = TRUE
+ordered_states <- TRUE
+n_tries <- 1
+max_iter <- 1000
+init_kmeans <- TRUE
+threshold <- 1e-6
+verbose <- TRUE
 ```
 
 # Estimation
 
 ```{r}
-mixhmmr <- emMixHMMR(simulatedtimeseries$X, t(simulatedtimeseries[, 2:ncol(simulatedtimeseries)]), K, R, p, variance_type, ordered_states, n_tries, max_iter, init_kmeans, threshold, verbose)
+mixhmmr <- emMixHMMR(toydataset$x, t(toydataset[,2:ncol(toydataset)]), K, R, p,
+                     variance_type, ordered_states, init_kmeans, n_tries, max_iter,
+                     threshold, verbose)
 ```
 
 # Summary
