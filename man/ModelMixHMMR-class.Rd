@@ -11,10 +11,10 @@ ModelMixHMMR represents an estimated MixHMMR model.
 \section{Fields}{
 
 \describe{
-\item{\code{paramMixHMMR}}{A \link{ParamMixHMMR} object. It contains the
+\item{\code{param}}{A \link{ParamMixHMMR} object. It contains the
 estimated values of the parameters.}
 
-\item{\code{statMixHMMR}}{A \link{StatMixHMMR} object. It contains all the
+\item{\code{stat}}{A \link{StatMixHMMR} object. It contains all the
 statistics associated to the MixHMMR model.}
 }}
 

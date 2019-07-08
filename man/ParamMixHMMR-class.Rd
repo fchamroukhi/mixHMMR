@@ -54,8 +54,8 @@ and the logistic regressions.}
 \section{Methods}{
 
 \describe{
-\item{\code{initParam(order_constraint = TRUE, init_kmeans = TRUE, try_algo = 1)}}{Method to initialize parameters \code{alpha}, \code{prior}, \code{trans_mat},
-      \code{beta} and \code{sigma2}.
+\item{\code{initParam(order_constraint = TRUE, init_kmeans = TRUE, try_algo = 1)}}{Method to initialize parameters \code{alpha}, \code{prior},
+      \code{trans_mat}, \code{beta} and \code{sigma2}.
 
       If \code{init_kmeans = TRUE} then the curve partition is initialized by
       the K-means algorithm. Otherwise the curve partition is initialized
@@ -69,8 +69,9 @@ and the logistic regressions.}
 
 \item{\code{initRegressionParam(Y, k, R, phi, variance_type, try_algo)}}{Initialize \code{beta} and \code{sigma2} for the cluster \code{k}.}
 
-\item{\code{MStep(statMixHMM, order_constraint = TRUE)}}{Method which implements the M-step of the EM algorithm to learn the
-parameters of the MixHMMR model based on statistics provided by
-\code{statMixHMMR} (which contains the E-step).}
+\item{\code{MStep(statMixHMMR, order_constraint = TRUE)}}{Method which implements the M-step of the EM algorithm to learn the
+parameters of the MixHMMR model based on statistics provided by the
+object \code{statMixHMMR} of class \link{StatMixHMMR} (which contains
+the E-step).}
 }}
 

@@ -55,6 +55,26 @@ Criterion).}
 \item{\code{exp_num_trans_from_l}}{Private. Only defined for calculations.}
 }}
 
+\section{Methods}{
+
+\describe{
+\item{\code{computeStats(paramMixHMMR, cputime_total)}}{Method used in the EM algorithm to compute statistics based on
+parameters provided by the object \code{paramMixHMMR} of class
+\link{ParamMixHMMR}. It also calculates the average computing time of a
+single run of the EM algorithm.}
+
+\item{\code{EStep(paramMixHMMR)}}{Method used in the EM algorithm to update statistics based on parameters
+provided by the object \code{paramMixHMMR} of class \link{ParamMixHMMR}
+(prior and posterior probabilities).}
+
+\item{\code{MAP()}}{MAP calculates values of the fields \code{z_ik} and \code{klas}
+      by applying the Maximum A Posteriori Bayes allocation rule.
+
+      \eqn{z\_ik = 1 \ \textrm{if} \ z\_ik = \textrm{arg} \
+      \textrm{max}_{s} \ P(z_{is} = 1 | \boldsymbol{Y_{i}};
+      \boldsymbol{\Psi}) = tau\_tk;\ 0 \ \textrm{otherwise}}{z_ik = 1 if
+      z_ik = arg max_s P(z_{is} = 1 | Y_{i}; \Psi) = tau_tk; 0 otherwise}}
+}}
 
 \seealso{
 \link{ParamMixHMMR}

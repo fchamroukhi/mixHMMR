@@ -83,8 +83,8 @@ ParamMixHMMR <- setRefClass(
     },
 
     initParam = function(order_constraint = TRUE, init_kmeans = TRUE, try_algo = 1) {
-      "Method to initialize parameters \\code{alpha}, \\code{prior}, \\code{trans_mat},
-      \\code{beta} and \\code{sigma2}.
+      "Method to initialize parameters \\code{alpha}, \\code{prior},
+      \\code{trans_mat}, \\code{beta} and \\code{sigma2}.
 
       If \\code{init_kmeans = TRUE} then the curve partition is initialized by
       the K-means algorithm. Otherwise the curve partition is initialized
@@ -230,13 +230,14 @@ ParamMixHMMR <- setRefClass(
       }
     },
 
-    MStep = function(statMixHMM, order_constraint = TRUE) {
+    MStep = function(statMixHMMR, order_constraint = TRUE) {
       "Method which implements the M-step of the EM algorithm to learn the
-      parameters of the MixHMMR model based on statistics provided by
-      \\code{statMixHMMR} (which contains the E-step)."
+      parameters of the MixHMMR model based on statistics provided by the
+      object \\code{statMixHMMR} of class \\link{StatMixHMMR} (which contains
+      the E-step)."
 
       # Maximization of Q1 w.r.t alpha
-      alpha <<- matrix(apply(statMixHMM$tau_ik, 2, sum)) / fData$n
+      alpha <<- matrix(apply(statMixHMMR$tau_ik, 2, sum)) / fData$n
 
       exp_num_trans_k <- array(0, dim = c(R, R, fData$n))
 
@@ -245,19 +246,19 @@ ParamMixHMMR <- setRefClass(
           s <- 0
         }
 
-        weights_cluster_k <- statMixHMM$tau_ik[, k]
+        weights_cluster_k <- statMixHMMR$tau_ik[, k]
 
         # Maximization of Q2 w.r.t \pi^g
-        exp_num_trans_k_from_l <- (matrix(1, R, 1) %*% t(weights_cluster_k)) * statMixHMM$exp_num_trans_from_l[, , k] # [R x n]
+        exp_num_trans_k_from_l <- (matrix(1, R, 1) %*% t(weights_cluster_k)) * statMixHMMR$exp_num_trans_from_l[, , k] # [R x n]
 
-        prior[, k] <<- (1 / sum(statMixHMM$tau_ik[, k])) * apply(exp_num_trans_k_from_l, 1, sum) # sum over i
+        prior[, k] <<- (1 / sum(statMixHMMR$tau_ik[, k])) * apply(exp_num_trans_k_from_l, 1, sum) # sum over i
 
         # Maximization of Q3 w.r.t A^g
         for (r in 1:R) {
           if (fData$n == 1) {
-            exp_num_trans_k[r, ,] <- t(matrix(1, R, 1) %*% weights_cluster_k) * drop(statMixHMM$exp_num_trans[r, , , k])
+            exp_num_trans_k[r, ,] <- t(matrix(1, R, 1) %*% weights_cluster_k) * drop(statMixHMMR$exp_num_trans[r, , , k])
           } else {
-            exp_num_trans_k[r, ,] <- (matrix(1, R, 1) %*% t(weights_cluster_k)) * drop(statMixHMM$exp_num_trans[r, , , k])
+            exp_num_trans_k[r, ,] <- (matrix(1, R, 1) %*% t(weights_cluster_k)) * drop(statMixHMMR$exp_num_trans[r, , , k])
           }
         }
 
@@ -276,17 +277,17 @@ ParamMixHMMR <- setRefClass(
 
         # Maximisation of Q4 w.r.t with betak et sigmak
 
-        Ng <- apply(statMixHMM$tau_ik, 2, sum) # Nbr of individuals within the cluster k ,k=1...K estimated at iteration q
+        Ng <- apply(statMixHMMR$tau_ik, 2, sum) # Nbr of individuals within the cluster k ,k=1...K estimated at iteration q
         ng <- Ng # Cardinal nbr of the cluster k
         # Each sequence i (m observations) is first weighted by the cluster weights
-        weights_cluster_k <- matrix(t(statMixHMM$tau_ik[, k]), nrow = fData$m, ncol = ncol(t(statMixHMM$tau_ik)), byrow = T)
+        weights_cluster_k <- matrix(t(statMixHMMR$tau_ik[, k]), nrow = fData$m, ncol = ncol(t(statMixHMMR$tau_ik)), byrow = T)
         weights_cluster_k <- matrix(as.vector(weights_cluster_k), length(as.vector(weights_cluster_k)), 1)
 
         # Secondly, the m observations of each sequence are weighted by the
         # weights of each segment k (post prob of the segments for each
         # cluster g)
 
-        gamma_ijk <- statMixHMM$gamma_ikjr[, , k] # [n*m R]
+        gamma_ijk <- statMixHMMR$gamma_ikjr[, , k] # [n*m R]
 
         nm_kr <- apply(as.matrix(gamma_ijk), 2, sum) # Cardinal nbr of the segments r,r=1,...,R within each cluster k, at iteration q
 

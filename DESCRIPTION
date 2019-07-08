@@ -1,6 +1,6 @@
 Type: Package
 Package: mixHMMR
-Title: Mixture of Hidden Markov Model Regression (mixHMMR) for Simultaneous Curve Clustering and Segmentation
+Title: Mixture of Hidden Markov Model Regression ('mixHMMR') for Simultaneous Curve Clustering and Segmentation
 Version: 0.1.0
 Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
     email = "faicel.chamroukhi@unicaen.fr",
@@ -36,7 +36,7 @@ Collate:
     ParamMixHMMR.R
     StatMixHMMR.R
     ModelMixHMMR.R
-    ModelLearner.R
+    emMixHMMR.R
     data-toydataset.R
 VignetteBuilder: knitr
 Encoding: UTF-8
