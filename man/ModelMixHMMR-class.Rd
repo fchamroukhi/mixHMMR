@@ -21,9 +21,16 @@ statistics associated to the MixHMMR model.}
 \section{Methods}{
 
 \describe{
-\item{\code{plot()}}{Plot method.}
+\item{\code{plot(...)}}{Plot method
+\describe{
+  \item{\code{\dots}}{Other graphics parameters.}
+}}
 
-\item{\code{summary()}}{Summary method.}
+\item{\code{summary(digits = getOption("digits"))}}{Summary method.
+\describe{
+  \item{\code{digits}}{The number of significant digits to use when
+    printing.}
+}}
 }}
 
 \seealso{

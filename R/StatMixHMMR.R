@@ -11,7 +11,6 @@
 #' @field loglik Numeric. Log-likelihood of the MixHMMR model.
 #' @field stored_loglik List. Stored values of the log-likelihood at each
 #'   iteration of the EM algorithm.
-#' @field cputime Numeric. Average computing time of a EM algorithm run.
 #' @field klas Row matrix of the labels issued from `tau_ik`. Its elements are
 #'   \eqn{klas(i) = k}, \eqn{i = 1,\dots,n}.
 #' @field z_ik Hard segmentation logical matrix of dimension \eqn{(n, K)}
@@ -43,7 +42,6 @@ StatMixHMMR <- setRefClass(
     exp_num_trans_from_l = "array",
     loglik = "numeric",
     stored_loglik = "list",
-    cputime = "numeric",
     klas = "matrix",
     z_ik = "matrix",
     smoothed = "matrix",
@@ -62,7 +60,6 @@ StatMixHMMR <- setRefClass(
       exp_num_trans_from_l <<- array(NA, dim = c(paramMixHMMR$R, paramMixHMMR$fData$n, paramMixHMMR$K))
       loglik <<- -Inf
       stored_loglik <<- list()
-      cputime <<- Inf
       klas <<- matrix(NA, paramMixHMMR$fData$n, 1) # klas: [nx1 double]
       z_ik <<- matrix(NA, paramMixHMMR$fData$n, paramMixHMMR$K) # z_ik: [nxK]
       smoothed <<- matrix(NA, paramMixHMMR$fData$m, paramMixHMMR$K)
@@ -93,17 +90,14 @@ StatMixHMMR <- setRefClass(
       }
     },
 
-    computeStats = function(paramMixHMMR, cputime_total) {
+    computeStats = function(paramMixHMMR) {
       "Method used in the EM algorithm to compute statistics based on
       parameters provided by the object \\code{paramMixHMMR} of class
-      \\link{ParamMixHMMR}. It also calculates the average computing time of a
-      single run of the EM algorithm."
-
-      cputime <<- mean(cputime_total)
+      \\link{ParamMixHMMR}."
 
       for (k in 1:paramMixHMMR$K) {
-        betakr <- paramMixHMMR$beta[, , k]
-        weighted_segments <- apply(gamma_ikjr[, , k] * (repmat(paramMixHMMR$phi, paramMixHMMR$fData$n, 1) %*% betakr), 1, sum)
+
+        weighted_segments <- apply(gamma_ikjr[, , k] * (repmat(paramMixHMMR$phi, paramMixHMMR$fData$n, 1) %*% as.matrix(paramMixHMMR$beta[, , k])), 1, sum)
         dim(weighted_segments) <- c(paramMixHMMR$fData$m, paramMixHMMR$fData$n)
         weighted_clusters <- (matrix(1, paramMixHMMR$fData$m, 1) %*% t(tau_ik[, k])) * weighted_segments
         smoothed[, k] <<- apply(weighted_clusters, 1, sum) / sum(tau_ik[, k])

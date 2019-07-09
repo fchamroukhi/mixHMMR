@@ -15,30 +15,42 @@ ModelMixHMMR <- setRefClass(
     stat = "StatMixHMMR"
   ),
   methods = list(
-    plot = function() {
-      "Plot method."
+    plot = function(...) {
+      "Plot method
+      \\describe{
+        \\item{\\code{\\dots}}{Other graphics parameters.}
+      }"
+
+      oldpar <- par(no.readonly = TRUE)
+      on.exit(par(oldpar), add = TRUE)
 
       # yaxislim <- c(min(param$fData$Y) - 2 * mean(sqrt(apply(param$fData$Y, 1, var))), max(param$fData$Y) + 2 * mean(sqrt(apply(param$fData$Y, 1, var))))
 
-      matplot(param$fData$X, t(param$fData$Y), type = "l", lty = "solid", col = "black", xlab = "x", ylab = "y(t)")
+      matplot(param$fData$X, t(param$fData$Y), type = "l", lty = "solid", col = "black", xlab = "x", ylab = "y(t)", ...)
       title(main = "Original time series")
 
 
       colorsvec <- rainbow(param$K)
-      matplot(param$fData$X, t(param$fData$Y), type = "l", lty = "dotted", col = colorsvec[stat$klas], xlab = "x", ylab = "y(t)")
+      matplot(param$fData$X, t(param$fData$Y), type = "l", lty = "dotted", col = colorsvec[stat$klas], xlab = "x", ylab = "y(t)", ...)
       title(main = "Clustered time series")
 
       for (k in 1:param$K) {
-        matplot(param$fData$X, t(param$fData$Y[stat$klas == k,]), type = "l", lty = "dotted", col = colorsvec[k], xlab = "x", ylab = "y(t)")
+        if (sum(stat$klas == k) > 1) { # More than one curve for cluster k
+          matplot(param$fData$X, t(param$fData$Y[stat$klas == k,]), type = "l", lty = "dotted", col = colorsvec[k], xlab = "x", ylab = "y(t)", ...)
+        } else {# Only one curve in cluster k
+          matplot(param$fData$X, param$fData$Y[stat$klas == k,], type = "l", lty = "dotted", col = colorsvec[k], xlab = "x", ylab = "y(t)", ...)
+        }
         title(main = sprintf("Cluster %1.1i", k))
-        lines(param$fData$X, stat$smoothed[, k], lwd = 1.5)
+        lines(param$fData$X, stat$smoothed[, k], lwd = 1.5, ...)
       }
     },
 
-    summary = function() {
-      "Summary method."
-
-      digits = getOption("digits")
+    summary = function(digits = getOption("digits")) {
+      "Summary method.
+      \\describe{
+        \\item{\\code{digits}}{The number of significant digits to use when
+          printing.}
+      }"
 
       title <- paste("Fitted mixHMMR model")
       txt <- paste(rep("-", min(nchar(title) + 4, getOption("width"))), collapse = "")
@@ -62,7 +74,7 @@ ModelMixHMMR <- setRefClass(
           row.names = "", check.names = FALSE)
       print(tab, digits = digits)
 
-      cat("\nClustering table:")
+      cat("\nClustering table (Number of curves in each clusters):\n")
       print(table(stat$klas))
 
       cat("\nMixing probabilities (cluster weights):\n")

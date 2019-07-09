@@ -6,7 +6,7 @@
 \usage{
 emMixHMMR(X, Y, K, R, p = 3, variance_type = c("heteroskedastic",
   "homoskedastic"), order_constraint = TRUE, init_kmeans = TRUE,
-  n_tries = 1, max_iter = 1000, threshold = 1e-06, verbose = TRUE)
+  n_tries = 1, max_iter = 1000, threshold = 1e-06, verbose = FALSE)
 }
 \arguments{
 \item{X}{Numeric vector of length \emph{m} representing the covariates/inputs
