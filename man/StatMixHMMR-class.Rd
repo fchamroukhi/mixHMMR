@@ -21,8 +21,8 @@ probabilities that the observation \eqn{Y_{ij}} originates from the
 
 \item{\code{loglik}}{Numeric. Log-likelihood of the MixHMMR model.}
 
-\item{\code{stored_loglik}}{List. Stored values of the log-likelihood at each
-iteration of the EM algorithm.}
+\item{\code{stored_loglik}}{Numeric vector. Stored values of the log-likelihood at
+each iteration of the EM algorithm.}
 
 \item{\code{klas}}{Row matrix of the labels issued from \code{tau_ik}. Its elements are
 \eqn{klas(i) = k}, \eqn{i = 1,\dots,n}.}

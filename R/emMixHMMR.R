@@ -96,7 +96,7 @@ emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "h
         } # Basically for the first iteration when prev_loglik is Inf
 
         prev_loglik <- stat$loglik
-        stat$stored_loglik[iter] <- stat$loglik
+        stat$stored_loglik <- c(stat$stored_loglik, stat$loglik)
 
       } # End of EM loop
 

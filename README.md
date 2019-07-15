@@ -1,11 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-## Overview
-
 <!-- badges: start -->
 
 <!-- badges: end -->
+
+## Overview
 
 R code for the **clustering** and **segmentation** of time series
 (including with regime changes) by mixture of gaussian Hidden Markov
@@ -85,7 +85,8 @@ mixhmmr$summary()
 #>  log-likelihood nu       AIC      BIC      ICL
 #>       -15092.16 62 -15154.16 -15197.6 -15197.6
 #> 
-#> Clustering table:
+#> Clustering table (Number of curves in each clusters):
+#> 
 #>  1  2  3 
 #> 10 10 10 
 #> 
@@ -100,21 +101,6 @@ mixhmmr$summary()
 #> Regression coefficients:
 #> 
 #>     Beta(R = 1) Beta(R = 2) Beta(R = 3)
-#> 1     6.8643627    64.43719    6.218654
-#> X^1   1.2876344  -462.55911   -3.949075
-#> X^2  -0.1413059   893.93553    1.560385
-#> 
-#> Variances:
-#> 
-#>  Sigma2(R = 1) Sigma2(R = 2) Sigma2(R = 3)
-#>      0.9770486     0.8116849      1.029812
-#> 
-#> --------------------
-#> Cluster 2 (K = 2):
-#> 
-#> Regression coefficients:
-#> 
-#>     Beta(R = 1) Beta(R = 2) Beta(R = 3)
 #> 1      6.002044    13.62910    4.934443
 #> X^1    9.248449   -41.99225    4.615747
 #> X^2  -41.739255    47.63765   -2.884340
@@ -125,7 +111,7 @@ mixhmmr$summary()
 #>      0.9961152      1.008064      1.006024
 #> 
 #> --------------------
-#> Cluster 3 (K = 3):
+#> Cluster 2 (K = 2):
 #> 
 #> Regression coefficients:
 #> 
@@ -138,8 +124,23 @@ mixhmmr$summary()
 #> 
 #>  Sigma2(R = 1) Sigma2(R = 2) Sigma2(R = 3)
 #>      0.9509166      1.052753     0.9495063
+#> 
+#> --------------------
+#> Cluster 3 (K = 3):
+#> 
+#> Regression coefficients:
+#> 
+#>     Beta(R = 1) Beta(R = 2) Beta(R = 3)
+#> 1     6.8643627    64.43719    6.218654
+#> X^1   1.2876344  -462.55911   -3.949075
+#> X^2  -0.1413059   893.93553    1.560385
+#> 
+#> Variances:
+#> 
+#>  Sigma2(R = 1) Sigma2(R = 2) Sigma2(R = 3)
+#>      0.9770486     0.8116849      1.029812
 
 mixhmmr$plot()
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-4.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-5.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-4.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-5.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-6.png" style="display: block; margin: auto;" />

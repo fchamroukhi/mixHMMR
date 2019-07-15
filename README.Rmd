@@ -12,10 +12,11 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-"
 )
 ```
-## Overview
 
 <!-- badges: start -->
 <!-- badges: end -->
+
+## Overview
 
 R code for the **clustering** and **segmentation** of time series (including with regime changes) by mixture of gaussian Hidden Markov Models Regression (MixHMMR) and the EM algorithm, i.e functional data clustering and segmentation.
 
