@@ -9,10 +9,12 @@ Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
     email = "marius.bartcus@gmail.com"),
     person("Florian", "Lecocq", role = c("aut", "cre"),
     email = "florian.lecocq@outlook.com"))
-Description: Simultaneous model-based clustering and segmentation of heterogeneous and 
-    dynamical functional data (curves/times series) with changes in regime by a mixture 
-    of gaussian regression models with hidden Markov processes, fitted by the EM/Baum-Welch 
-    algorithm. See also the packages 'mixRHLP', 'mixHMM', and 'HMMR'.
+Description: Simultaneous model-based clustering and segmentation of 
+    heterogeneous and dynamical functional data (curves/times series) with 
+    changes in regime by a mixture of gaussian regression models with hidden 
+    Markov processes, fitted by the EM/Baum-Welch algorithm. See also the 
+    packages 'mixRHLP', 'mixHMM', and 'HMMR'.
+URL: https://github.com/fchamroukhi/mixHMMR
 License: GPL (>= 3)
 Depends: 
     R (>= 2.10)
