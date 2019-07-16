@@ -97,7 +97,8 @@ StatMixHMMR <- setRefClass(
 
       for (k in 1:paramMixHMMR$K) {
 
-        weighted_segments <- apply(gamma_ikjr[, , k] * (repmat(paramMixHMMR$phi, paramMixHMMR$fData$n, 1) %*% as.matrix(paramMixHMMR$beta[, , k])), 1, sum)
+        betakr <- matrix(paramMixHMMR$beta[, , k], nrow = paramMixHMMR$p + 1, ncol = paramMixHMMR$R)
+        weighted_segments <- apply(gamma_ikjr[, , k] * (repmat(paramMixHMMR$phi, paramMixHMMR$fData$n, 1) %*% betakr), 1, sum)
         dim(weighted_segments) <- c(paramMixHMMR$fData$m, paramMixHMMR$fData$n)
         weighted_clusters <- (matrix(1, paramMixHMMR$fData$m, 1) %*% t(tau_ik[, k])) * weighted_segments
         smoothed[, k] <<- apply(weighted_clusters, 1, sum) / sum(tau_ik[, k])
