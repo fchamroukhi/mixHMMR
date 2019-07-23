@@ -16,13 +16,17 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-## Overview
+# Overview
 
-R code for the **clustering** and **segmentation** of time series (including with regime changes) by mixture of gaussian Hidden Markov Models Regression (MixHMMR) and the EM algorithm, i.e functional data clustering and segmentation.
+R code for the **clustering** and **segmentation** of time series (including 
+with regime changes) by mixture of gaussian Hidden Markov Models Regression 
+(MixHMMR) and the EM algorithm, i.e functional data clustering and 
+segmentation.
 
-## Installation
+# Installation
 
-You can install the development version of mixHMMR from [GitHub](https://github.com/) with:
+You can install the development version of mixHMMR from [GitHub](https://github.com/)
+with:
 
 ```{r, eval = FALSE}
 # install.packages("devtools")
@@ -44,16 +48,19 @@ Use the following command to display vignettes:
 browseVignettes("mixHMMR")
 ```
 
-## Usage
+# Usage
 
 ```{r, message = FALSE}
 library(mixHMMR)
+```
 
+```{r, message = FALSE}
+# Application to a toy data set
 data("toydataset")
 
 K <- 3 # Number of clusters
 R <- 3 # Number of regimes/states
-p <- 2 # Degree of the polynomial regression
+p <- 1 # Degree of the polynomial regression
 variance_type <- "heteroskedastic" # "heteroskedastic" or "homoskedastic" model
 
 ordered_states <- TRUE

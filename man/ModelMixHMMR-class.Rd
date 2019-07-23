@@ -21,8 +21,19 @@ statistics associated to the MixHMMR model.}
 \section{Methods}{
 
 \describe{
-\item{\code{plot(...)}}{Plot method
+\item{\code{plot(what = c("clustered", "smoothed", "loglikelihood"), ...)}}{Plot method
 \describe{
+  \item{\code{what}}{The type of graph requested:
+    \itemize{
+      \item \code{"clustered" = } Clustered curves (field
+        \code{klas} of class \link{StatMixHMMR}).
+      \item \code{"smoothed" = } Smoothed signal (field
+        \code{smoothed} of class {StatMixHMMR}).
+      \item \code{"loglikelihood" = } Value of the log-likelihood for
+        each iteration (field \code{stored_loglik} of class
+        \link{StatMixHMMR}).
+    }
+  }
   \item{\code{\dots}}{Other graphics parameters.}
 }}
 
@@ -33,6 +44,25 @@ statistics associated to the MixHMMR model.}
 }}
 }}
 
+\examples{
+data(toydataset)
+
+mixhmmr <- emMixHMMR(toydataset$x, t(toydataset[,2:ncol(toydataset)]),
+                     K = 3, R = 3, p = 1, verbose = TRUE)
+
+# mixhmmr is a ModelMixHMMR object. It contains some methods such as 'summary' and 'plot'
+mixhmmr$summary()
+mixhmmr$plot()
+
+# mixhmmr has also two fields, stat and param which are reference classes as well
+
+# Log-likelihood:
+mixhmmr$stat$loglik
+
+# Parameters of the polynomial regressions:
+mixhmmr$param$beta
+
+}
 \seealso{
 \link{ParamMixHMMR}, \link{StatMixHMMR}
 }
