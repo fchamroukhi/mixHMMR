@@ -1,15 +1,15 @@
-#' emMixHMMR is used to fit a MixHMMR model.
+#' emMixHMMR implements the EM algorithm to fit a mixture if HMMR models.
 #'
-#' emMixHMMR is used to fit a MixHMMR model. The estimation method is performed by
-#' the Expectation-Maximization algorithm.
+#' emMixHMMR implements the maximum-likelihood parameter estimation of a mixture
+#' of HMMR models by the Expectation-Maximization (EM) algorithm.
 #'
 #' @details emMixHMMR function implements the EM algorithm. This function starts
 #'   with an initialization of the parameters done by the method `initParam` of
-#'   the class [ParamMixHMMR][ParamMixHMMR], then it alternates between the E-Step
-#'   (method of the class [StatMixHMMR][StatMixHMMR]) and the M-Step (method of
-#'   the class [ParamMixHMMR][ParamMixHMMR]) until convergence (until the relative
-#'   variation of log-likelihood between two steps of the EM algorithm is less
-#'   than the `threshold` parameter).
+#'   the class [ParamMixHMMR][ParamMixHMMR], then it alternates between the
+#'   E-Step (method of the class [StatMixHMMR][StatMixHMMR]) and the M-Step
+#'   (method of the class [ParamMixHMMR][ParamMixHMMR]) until convergence (until
+#'   the relative variation of log-likelihood between two steps of the EM
+#'   algorithm is less than the `threshold` parameter).
 #'
 #' @param X Numeric vector of length \emph{m} representing the covariates/inputs
 #'   \eqn{x_{1},\dots,x_{m}}.
@@ -20,13 +20,13 @@
 #' @param R The number of regimes (HMMR components) for each cluster.
 #' @param p Optional. The order of the polynomial regression. By default, `p` is
 #'   set at 3.
-#' @param variance_type Optional character indicating if the model is
+#' @param variance_type Optional. character indicating if the model is
 #'   "homoskedastic" or "heteroskedastic". By default the model is
 #'   "heteroskedastic".
 #' @param order_constraint Optional. A logical indicating whether or not a mask
-#'   of order one should be applied to the transition matrix of the Markov
-#'   chain. For the purpose of segmentation, it must be set to `TRUE` (which is
-#'   the default value).
+#'   of order one should be applied to the transition matrix of the Markov chain
+#'   to provide ordered states. For the purpose of segmentation, it must be set
+#'   to `TRUE` (which is the default value).
 #' @param init_kmeans Optional. A logical indicating whether or not the curve
 #'   partition should be initialized by the K-means algorithm. Otherwise the
 #'   curve partition is initialized randomly.
@@ -59,7 +59,7 @@
 #' mixhmmr$plot()
 emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "homoskedastic"), order_constraint = TRUE, init_kmeans = TRUE, n_tries = 1, max_iter = 1000, threshold = 1e-6, verbose = FALSE) {
 
-  fData <- FData$new(X = X, Y = Y)
+  fData <- FData(X = X, Y = Y)
 
   try_EM <- 0
   best_loglik <- -Inf
@@ -72,14 +72,15 @@ emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "h
 
     # Initialization
     variance_type <- match.arg(variance_type)
-    param <- ParamMixHMMR$new(fData = fData, K = K, R = R, p = p, variance_type = variance_type)
-    param$initParam(order_constraint, init_kmeans, try_EM)
+    param <- ParamMixHMMR(fData = fData, K = K, R = R, p = p, variance_type = variance_type, order_constraint = order_constraint)
+
+    param$initParam(init_kmeans, try_EM)
 
     iter <- 0
     converged <- FALSE
     prev_loglik <- -Inf
 
-    stat <- StatMixHMMR$new(paramMixHMMR = param)
+    stat <- StatMixHMMR(paramMixHMMR = param)
 
     # EM
     while ((iter <= max_iter) & !converged) {
@@ -88,12 +89,12 @@ emMixHMMR <- function(X, Y, K, R, p = 3, variance_type = c("heteroskedastic", "h
       stat$EStep(param)
 
       # M-Step
-      param$MStep(stat, order_constraint)
+      param$MStep(stat)
 
       iter <- iter + 1
 
       if (verbose) {
-        cat(paste0("EM: Iteration : ", iter, " || log-likelihood : "  , stat$loglik, "\n"))
+        cat(paste0("EM - mixHMMR: Iteration: ", iter, " || log-likelihood: "  , stat$loglik, "\n"))
       }
 
       if (prev_loglik - stat$loglik > 1e-4) {

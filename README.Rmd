@@ -25,8 +25,7 @@ segmentation.
 
 # Installation
 
-You can install the development version of mixHMMR from [GitHub](https://github.com/)
-with:
+You can install the development version of mixHMMR from [GitHub](https://github.com/) with:
 
 ```{r, eval = FALSE}
 # install.packages("devtools")

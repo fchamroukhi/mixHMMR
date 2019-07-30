@@ -4,9 +4,9 @@
 \name{ParamMixHMMR-class}
 \alias{ParamMixHMMR-class}
 \alias{ParamMixHMMR}
-\title{A Reference Class which contains parameters of a MixHMMR model.}
+\title{A Reference Class which contains parameters of a mixture of HMMR models.}
 \description{
-ParamMixHMMR contains all the parameters of a MixHMMR model.
+ParamMixHMMR contains all the parameters of a mixture of HMMR models.
 }
 \section{Fields}{
 
@@ -22,6 +22,11 @@ ParamMixHMMR contains all the parameters of a MixHMMR model.
 
 \item{\code{variance_type}}{Character indicating if the model is homoskedastic
 (\code{variance_type = "homoskedastic"}) or heteroskedastic (\code{variance_type = "heteroskedastic"}). By default the model is heteroskedastic.}
+
+\item{\code{order_constraint}}{A logical indicating whether or not a mask of order
+one should be applied to the transition matrix of the Markov chain to
+provide ordered states. For the purpose of segmentation, it must be set to
+\code{TRUE} (which is the default value).}
 
 \item{\code{alpha}}{Cluster weights. Matrix of dimension \eqn{(K, 1)}.}
 
@@ -47,14 +52,13 @@ matrix of size \eqn{(R, K)} (otherwise MixHMMR model is homoskedastic
 \item{\code{nu}}{The degree of freedom of the MixHMMR model representing the
 complexity of the model.}
 
-\item{\code{phi}}{A list giving the regression design matrices for the polynomial
-and the logistic regressions.}
+\item{\code{phi}}{A list giving the regression design matrix for the polynomial regressions.}
 }}
 
 \section{Methods}{
 
 \describe{
-\item{\code{initParam(order_constraint = TRUE, init_kmeans = TRUE, try_algo = 1)}}{Method to initialize parameters \code{alpha}, \code{prior},
+\item{\code{initParam(init_kmeans = TRUE, try_algo = 1)}}{Method to initialize parameters \code{alpha}, \code{prior},
       \code{trans_mat}, \code{beta} and \code{sigma2}.
 
       If \code{init_kmeans = TRUE} then the curve partition is initialized by
@@ -69,7 +73,7 @@ and the logistic regressions.}
 
 \item{\code{initRegressionParam(Y, k, R, phi, variance_type, try_algo)}}{Initialize \code{beta} and \code{sigma2} for the cluster \code{k}.}
 
-\item{\code{MStep(statMixHMMR, order_constraint = TRUE)}}{Method which implements the M-step of the EM algorithm to learn the
+\item{\code{MStep(statMixHMMR)}}{Method which implements the M-step of the EM algorithm to learn the
 parameters of the MixHMMR model based on statistics provided by the
 object \code{statMixHMMR} of class \link{StatMixHMMR} (which contains
 the E-step).}

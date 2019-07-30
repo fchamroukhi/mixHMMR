@@ -2,7 +2,7 @@
 % Please edit documentation in R/emMixHMMR.R
 \name{emMixHMMR}
 \alias{emMixHMMR}
-\title{emMixHMMR is used to fit a MixHMMR model.}
+\title{emMixHMMR implements the EM algorithm to fit a mixture if HMMR models.}
 \usage{
 emMixHMMR(X, Y, K, R, p = 3, variance_type = c("heteroskedastic",
   "homoskedastic"), order_constraint = TRUE, init_kmeans = TRUE,
@@ -23,14 +23,14 @@ points \eqn{1,\dots,m}.}
 \item{p}{Optional. The order of the polynomial regression. By default, \code{p} is
 set at 3.}
 
-\item{variance_type}{Optional character indicating if the model is
+\item{variance_type}{Optional. character indicating if the model is
 "homoskedastic" or "heteroskedastic". By default the model is
 "heteroskedastic".}
 
 \item{order_constraint}{Optional. A logical indicating whether or not a mask
-of order one should be applied to the transition matrix of the Markov
-chain. For the purpose of segmentation, it must be set to \code{TRUE} (which is
-the default value).}
+of order one should be applied to the transition matrix of the Markov chain
+to provide ordered states. For the purpose of segmentation, it must be set
+to \code{TRUE} (which is the default value).}
 
 \item{init_kmeans}{Optional. A logical indicating whether or not the curve
 partition should be initialized by the K-means algorithm. Otherwise the
@@ -58,17 +58,17 @@ the log-likelihood should be printed during EM iterations.}
 EM returns an object of class \link{ModelMixHMMR}.
 }
 \description{
-emMixHMMR is used to fit a MixHMMR model. The estimation method is performed by
-the Expectation-Maximization algorithm.
+emMixHMMR implements the maximum-likelihood parameter estimation of a mixture
+of HMMR models by the Expectation-Maximization (EM) algorithm.
 }
 \details{
 emMixHMMR function implements the EM algorithm. This function starts
 with an initialization of the parameters done by the method \code{initParam} of
-the class \link{ParamMixHMMR}, then it alternates between the E-Step
-(method of the class \link{StatMixHMMR}) and the M-Step (method of
-the class \link{ParamMixHMMR}) until convergence (until the relative
-variation of log-likelihood between two steps of the EM algorithm is less
-than the \code{threshold} parameter).
+the class \link{ParamMixHMMR}, then it alternates between the
+E-Step (method of the class \link{StatMixHMMR}) and the M-Step
+(method of the class \link{ParamMixHMMR}) until convergence (until
+the relative variation of log-likelihood between two steps of the EM
+algorithm is less than the \code{threshold} parameter).
 }
 \examples{
 data(toydataset)
