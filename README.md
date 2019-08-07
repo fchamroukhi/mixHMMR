@@ -47,6 +47,8 @@ library(mixHMMR)
 ``` r
 # Application to a toy data set
 data("toydataset")
+x <- toydataset$x
+Y <- t(toydataset[,2:ncol(toydataset)])
 
 K <- 3 # Number of clusters
 R <- 3 # Number of regimes/states
@@ -60,9 +62,8 @@ init_kmeans <- TRUE
 threshold <- 1e-6
 verbose <- TRUE
 
-mixhmmr <- emMixHMMR(toydataset$x, t(toydataset[,2:ncol(toydataset)]), K, R, p,
-                     variance_type, ordered_states, init_kmeans, n_tries, max_iter,
-                     threshold, verbose)
+mixhmmr <- emMixHMMR(X = x, Y = Y, K, R, p, variance_type, ordered_states, 
+                     init_kmeans, n_tries, max_iter, threshold, verbose)
 #> EM - mixHMMR: Iteration: 1 || log-likelihood: -18975.6323298895
 #> EM - mixHMMR: Iteration: 2 || log-likelihood: -15198.5811534058
 #> EM - mixHMMR: Iteration: 3 || log-likelihood: -15118.0350455527
